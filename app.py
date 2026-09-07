@@ -1,14 +1,16 @@
 """
 SBC Growth Group - RSVP Coordinator
 ------------------------------------
-Single-page, mobile-first RSVP app for a church growth group.
+Single-page, mobile-first, colorful RSVP app for a church growth group.
 
-- 5 family cards: check the box if attending, type in a headcount, submit.
-- A confirmation dialog names the family before saving, so nobody
-  accidentally RSVPs for the wrong household.
-- Admin (PIN protected) can edit the event date/time/address and the
-  "food needed" list, which changes week to week.
-- Data lives in Firebase Firestore so it survives Streamlit Cloud reboots.
+Each family gets one compact row: name, "Going?" checkbox, headcount,
+a dropdown to pick what food item they're bringing (from the admin's
+weekly needed list), and a Save button that confirms before writing.
+
+Admin (PIN protected) edits the event date/time/address and the
+"food needed" list, which changes week to week.
+
+Data lives in Firebase Firestore so it survives Streamlit Cloud reboots.
 """
 
 import streamlit as st
@@ -25,12 +27,22 @@ FAMILIES = {
     "Siefert": ["Scott Siefert", "Susan Siefert"],
 }
 
+FAMILY_COLORS = {
+    "Crissman": "#ef4444",   # red
+    "Griffith": "#f59e0b",   # amber
+    "Lee": "#10b981",        # green
+    "Russell": "#3b82f6",    # blue
+    "Siefert": "#a855f7",    # purple
+}
+
 DEFAULT_EVENT = {
     "event_date": "",
     "event_time": "5:00 PM",
     "address": "17136 Mark Dr, Macomb, MI 48044",
     "food_needed": [],
 }
+
+NONE_OPTION = "â€” nothing yet â€”"
 
 # ----------------------------------------------------------------------
 # Styling
@@ -41,14 +53,42 @@ st.markdown(
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    .block-container {padding-top: 1.2rem; padding-bottom: 2rem; max-width: 480px;}
-    .topbar-title {font-size: 1.5rem; font-weight: 800; margin: 0; line-height: 1.2;}
-    div.stButton > button {border-radius: 10px; font-weight: 600;}
-    .family-name {font-weight: 700; font-size: 1.05rem; margin-bottom: 0.1rem;}
-    .family-members {color: #6b7280; font-size: 0.8rem; margin-bottom: 0.5rem;}
-    .status-yes {color: #16a34a; font-weight: 700;}
-    .status-no {color: #9ca3af; font-weight: 600;}
-    .version-tag {text-align: center; color: #d1d5db; font-size: 0.7rem; margin-top: 1.2rem;}
+    .block-container {padding-top: 1rem; padding-bottom: 2rem; max-width: 520px;}
+
+    .topbar-title {
+        font-size: 1.5rem; font-weight: 800; margin: 0; line-height: 1.2;
+        background: linear-gradient(90deg, #f97316, #ec4899, #8b5cf6);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    div.stButton > button {
+        border-radius: 10px; font-weight: 700; border: none;
+    }
+    div.stButton > button:has(span:contains("Admin")) {}
+    .admin-btn button {
+        background: linear-gradient(90deg, #6366f1, #a855f7) !important;
+        color: white !important;
+    }
+    .event-card {
+        border-radius: 14px; padding: 0.9rem 1.1rem; margin-bottom: 0.7rem;
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        border: 1px solid #fdba74;
+    }
+    .food-card {
+        border-radius: 14px; padding: 0.9rem 1.1rem; margin-bottom: 1rem;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        border: 1px solid #93c5fd;
+    }
+    .row-header {
+        display:flex; font-size: 0.72rem; font-weight: 700; color:#6b7280;
+        text-transform: uppercase; letter-spacing: 0.03em;
+        padding: 0 0.2rem; margin-bottom: -0.4rem;
+    }
+    .fam-name {font-weight: 800; font-size: 0.98rem; padding-top: 0.5rem;}
+    .fam-members {color:#9ca3af; font-size:0.68rem; margin-top:-0.35rem;}
+    .status-yes {color:#16a34a; font-size:0.68rem; font-weight:700;}
+    .status-no {color:#9ca3af; font-size:0.68rem;}
+    .version-tag {text-align:center; color:#e5e7eb; font-size:0.7rem; margin-top:1.4rem;}
+    hr {margin: 0.4rem 0;}
     </style>
     """,
     unsafe_allow_html=True,
@@ -94,9 +134,9 @@ def load_families():
     return {d.id: d.to_dict() for d in docs}
 
 
-def save_family(family, attending, count):
+def save_family(family, attending, count, bringing):
     db.collection("families").document(family).set(
-        {"attending": attending, "count": count}
+        {"attending": attending, "count": count, "bringing": bringing}
     )
 
 
@@ -104,16 +144,18 @@ def save_family(family, attending, count):
 # Confirmation dialog
 # ----------------------------------------------------------------------
 @st.dialog("Confirm your RSVP")
-def confirm_rsvp(family, attending, count):
+def confirm_rsvp(family, attending, count, bringing):
     st.markdown(f"You're updating the RSVP for the **{family} family**.")
     if attending:
         st.markdown(f"âœ… Attending â€” **{count}** coming")
     else:
         st.markdown("âŒ Not attending")
+    if bringing and bringing != NONE_OPTION:
+        st.markdown(f"ðŸ½ï¸ Bringing: **{bringing}**")
     st.caption("Make sure this is really your family before confirming.")
     c1, c2 = st.columns(2)
     if c1.button("Confirm", type="primary", use_container_width=True):
-        save_family(family, attending, count)
+        save_family(family, attending, count, bringing if bringing != NONE_OPTION else "")
         st.success(f"Saved RSVP for {family}!")
         st.rerun()
     if c2.button("Cancel", use_container_width=True):
@@ -134,72 +176,102 @@ if "admin_ok" not in st.session_state:
 # ----------------------------------------------------------------------
 # Top bar
 # ----------------------------------------------------------------------
-tcol1, tcol2 = st.columns([4, 1.3])
+tcol1, tcol2 = st.columns([3.2, 1.3])
 with tcol1:
     st.markdown("<p class='topbar-title'>ðŸ² SBC Growth Group</p>", unsafe_allow_html=True)
 with tcol2:
+    st.markdown("<div class='admin-btn'>", unsafe_allow_html=True)
     if st.button("ðŸ”’ Admin", use_container_width=True):
         st.session_state.admin_open = not st.session_state.admin_open
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
 # Event info card
 # ----------------------------------------------------------------------
-with st.container(border=True):
-    date_line = event["event_date"] if event["event_date"] else "Date TBD"
-    st.markdown(f"**ðŸ“… {date_line} &nbsp;Â·&nbsp; â° {event['event_time']}**")
-    st.markdown(f"ðŸ“ {event['address']}")
+date_line = event["event_date"] if event["event_date"] else "Date TBD"
+st.markdown(
+    f"""<div class="event-card">
+    <b>ðŸ“… {date_line} &nbsp;Â·&nbsp; â° {event['event_time']}</b><br>
+    ðŸ“ {event['address']}
+    </div>""",
+    unsafe_allow_html=True,
+)
 
 # ----------------------------------------------------------------------
 # Food needed card (read-only for everyone)
 # ----------------------------------------------------------------------
-with st.container(border=True):
-    st.markdown("**ðŸ¥˜ Food needed this week**")
-    if event["food_needed"]:
-        for item in event["food_needed"]:
-            st.markdown(f"- {item}")
-    else:
-        st.caption("Nothing posted yet â€” check back soon.")
+food_html = "ðŸ¥˜ <b>Food needed this week</b><br>"
+if event["food_needed"]:
+    food_html += "<br>".join(f"â€¢ {item}" for item in event["food_needed"])
+else:
+    food_html += "<span style='color:#93a3b8;'>Nothing posted yet â€” check back soon.</span>"
+st.markdown(f'<div class="food-card">{food_html}</div>', unsafe_allow_html=True)
 
+# ----------------------------------------------------------------------
+# Family RSVP rows
+# ----------------------------------------------------------------------
 st.markdown("#### Family RSVPs")
 
-# ----------------------------------------------------------------------
-# Family cards
-# ----------------------------------------------------------------------
+food_options = [NONE_OPTION] + event["food_needed"]
+
+st.markdown(
+    """<div class="row-header">
+    <div style="flex:2.3;">Family</div>
+    <div style="flex:0.9;">Going</div>
+    <div style="flex:0.9;"># </div>
+    <div style="flex:1.9;">Bringing</div>
+    <div style="flex:0.7;"></div>
+    </div>""",
+    unsafe_allow_html=True,
+)
+
 for family, members in FAMILIES.items():
     existing = families_data.get(family, {})
-    with st.container(border=True):
-        st.markdown(f"<div class='family-name'>{family} Family</div>", unsafe_allow_html=True)
-        st.markdown(
-            f"<div class='family-members'>{' &amp; '.join(members)}</div>",
-            unsafe_allow_html=True,
-        )
-        current_status = existing.get("attending")
-        if current_status is True:
-            st.markdown(
-                f"<span class='status-yes'>âœ… Currently marked attending "
-                f"({existing.get('count', 0)})</span>",
-                unsafe_allow_html=True,
-            )
-        elif current_status is False:
-            st.markdown("<span class='status-no'>Currently marked not attending</span>", unsafe_allow_html=True)
+    color = FAMILY_COLORS.get(family, "#374151")
 
+    c1, c2, c3, c4, c5 = st.columns([2.3, 0.9, 0.9, 1.9, 0.7])
+
+    with c1:
+        st.markdown(f"<div class='fam-name' style='color:{color};'>{family}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='fam-members'>{' & '.join(members)}</div>", unsafe_allow_html=True)
+
+    with c2:
         attending = st.checkbox(
-            "We're planning to attend",
-            value=bool(existing.get("attending", False)),
-            key=f"chk_{family}",
+            "Going", value=bool(existing.get("attending", False)),
+            key=f"chk_{family}", label_visibility="collapsed",
         )
-        count = st.number_input(
-            "How many are coming?",
-            min_value=0,
-            max_value=15,
-            value=int(existing.get("count", 2 if attending else 0)),
-            step=1,
-            key=f"cnt_{family}",
-        )
-        if st.button(f"Submit RSVP for {family}", key=f"submit_{family}", use_container_width=True):
-            confirm_rsvp(family, attending, count)
 
-st.markdown("<div class='version-tag'>v1.0</div>", unsafe_allow_html=True)
+    with c3:
+        count = st.number_input(
+            "#", min_value=0, max_value=15,
+            value=int(existing.get("count", 2 if attending else 0)),
+            step=1, key=f"cnt_{family}", label_visibility="collapsed",
+        )
+
+    with c4:
+        existing_bringing = existing.get("bringing", "")
+        options_for_family = food_options if existing_bringing in food_options or not existing_bringing else [existing_bringing] + food_options
+        default_index = options_for_family.index(existing_bringing) if existing_bringing in options_for_family else 0
+        bringing = st.selectbox(
+            "Bringing", options=options_for_family, index=default_index,
+            key=f"food_{family}", label_visibility="collapsed",
+        )
+
+    with c5:
+        if st.button("ðŸ’¾", key=f"save_{family}", help=f"Save RSVP for {family}"):
+            confirm_rsvp(family, attending, count, bringing)
+
+    status_html = (
+        f"<span class='status-yes'>âœ… {existing.get('count', 0)} coming"
+        + (f" Â· bringing {existing.get('bringing')}" if existing.get("bringing") else "")
+        + "</span>"
+        if existing.get("attending")
+        else "<span class='status-no'>No response yet</span>"
+    )
+    st.markdown(status_html, unsafe_allow_html=True)
+    st.markdown("<hr>", unsafe_allow_html=True)
+
+st.markdown("<div class='version-tag'>v1.1</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
 # Admin panel
