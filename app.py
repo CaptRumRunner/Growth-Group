@@ -1,18 +1,19 @@
 """
-SBC Growth Group - Bible Study RSVP Coordinator
-------------------------------------------------
-Single-page, mobile-first, light "Faith Fellowship" styled RSVP app.
+SBC Growth Group - Food Sign Up
+---------------------------------
+Single-page, mobile-first food sign-up board (Grace Fellowship style).
 
-- Hero banner, stat cards (date/time/location/attending), a welcome
-  callout, a live food-needed status table, per-family RSVP cards with
-  color accents, and a thank-you footer -- all on one page, no side tabs.
-- Admin (PIN protected, highlighted gold when unlocked) edits address,
-  upcoming dates, host food, and the food-needed list with quantities.
-- Data lives in Firebase Firestore so it survives Streamlit Cloud reboots.
+Signing a family up for a category IS their RSVP -- there's no separate
+attendance step. Each family has one active sign-up (a category + a
+headcount); picking a new category moves them there.
 
-Note: all decorative icons are small inline SVGs (generic outline glyphs,
-not copyrighted art) instead of emoji, so nothing can get corrupted when
-pasted through GitHub's web editor.
+Admin (PIN protected, gold when unlocked) edits address, upcoming dates,
+and the category list (name, description, how many families can sign up
+for each).
+
+Data lives in Firebase Firestore so it survives Streamlit Cloud reboots.
+All decorative icons are inline SVGs (generic outline glyphs) instead of
+emoji, so nothing gets corrupted when pasted through GitHub's editor.
 """
 
 import streamlit as st
@@ -38,32 +39,36 @@ FAMILY_COLORS = {
     "Siefert": "#8a5fa5",
 }
 
-SEED_DEFAULTS = {
-    "Griffith": {"attending": True, "count": 5, "bringing": ""},
+SEED_SIGNUPS = {
+    "Griffith": {"category": "Main Dish", "count": 5},
 }
 
 DEFAULT_EVENT = {
     "address": "17136 Mark Dr, Macomb, MI 48044",
     "time": "5:00 PM",
     "upcoming_dates": [],
-    "host_food": "",
-    "food_needed": [],  # list of {"name": str, "qty": int}
+    "categories": [
+        {"name": "Main Dish", "desc": "Casserole, pasta, chicken, etc.", "slots": 2},
+        {"name": "Side Dish", "desc": "Salad, vegetables, rice, etc.", "slots": 4},
+        {"name": "Dessert", "desc": "Cookies, brownies, fruit, etc.", "slots": 2},
+        {"name": "Drinks", "desc": "Water, tea, lemonade, etc.", "slots": 2},
+        {"name": "Plates / Utensils", "desc": "Plates, cups, napkins, utensils", "slots": 2},
+        {"name": "Other", "desc": "Anything else!", "slots": 2},
+    ],
 }
 
-NONE_OPTION = "-- nothing yet --"
-
 # ----------------------------------------------------------------------
-# Icons (generic outline glyphs, plain SVG - no emoji, no copyrighted art)
+# Icons (generic outline glyphs -- plain SVG, no emoji, no copyrighted art)
 # ----------------------------------------------------------------------
-ICON_BOOK = """<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#f7f3ec" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>"""
+ICON_LEAF = """<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 11 13.6 12 12"></path></svg>"""
 ICON_CAL = """<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>"""
-ICON_CLOCK = """<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>"""
 ICON_PIN = """<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>"""
 ICON_PEOPLE = """<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>"""
-ICON_LEAF = """<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 11 13.6 12 12"></path></svg>"""
+ICON_UTENSILS = """<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h1a2 2 0 0 0 2-2V2"></path><path d="M6 11v11"></path><path d="M18 2c-2 0-3 2-3 5v2c0 1 1 2 2 2h1v10"></path></svg>"""
+ICON_HEART = """<svg viewBox="0 0 24 24" width="22" height="22" fill="#3b6ea5" stroke="#3b6ea5" stroke-width="1"><path d="M12 21s-6.7-4.35-9.3-8.2C.8 9.7 1.9 6 5 5c1.9-.6 3.7.2 5 1.9C11.3 5.2 13.1 4.4 15 5c3.1 1 4.2 4.7 2.3 7.8C18.7 16.65 12 21 12 21z"></path></svg>"""
 
 # ----------------------------------------------------------------------
-# Styling - light, warm "Faith Fellowship" palette
+# Styling
 # ----------------------------------------------------------------------
 st.markdown(
     """
@@ -73,72 +78,67 @@ st.markdown(
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    .block-container {padding-top: 0.5rem; padding-bottom: 1.6rem; max-width: 560px;}
 
-    .block-container {padding-top: 0.6rem; padding-bottom: 1.6rem; max-width: 560px;}
+    .brand-row {display:flex; align-items:center; gap:0.5rem;}
+    .brand-name {font-family:'Merriweather', serif; font-size:1.15rem; font-weight:700; color:#1f2937; margin:0;}
+    .brand-sub {font-size:0.72rem; color:#8a8171; margin-top:-0.15rem;}
 
     .hero {
         background: linear-gradient(120deg, #5b3a29 0%, #7a5137 45%, #9c7248 100%);
-        border-radius: 16px; padding: 1.4rem 1.3rem 1.2rem 1.3rem; margin-bottom: 0.8rem;
-        color: #f7f3ec;
+        border-radius: 16px; padding: 1.3rem 1.2rem; margin: 0.6rem 0 0.8rem 0; color:#f7f3ec;
     }
-    .hero-top {display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.6rem;}
-    .hero-brand {font-size: 0.95rem; font-weight: 700; letter-spacing: 0.03em;}
-    .hero-title {
-        font-family: 'Merriweather', serif; font-size: 1.8rem; font-weight: 900;
-        margin: 0.1rem 0 0.1rem 0; line-height: 1.15;
-    }
-    .hero-sub {font-size: 1rem; opacity: 0.92; margin-bottom: 0.4rem;}
-    .hero-tags {font-size: 0.85rem; opacity: 0.85;}
+    .hero-title {font-family:'Merriweather', serif; font-size:1.65rem; font-weight:900; line-height:1.2; margin:0;}
+    .hero-sub {font-size:1rem; opacity:0.92; margin: 0.15rem 0 0.6rem 0;}
+    .hero-verse {font-size:0.85rem; font-style:italic; opacity:0.88; border-left:3px solid #d4af37; padding-left:0.6rem;}
 
-    .stat-card {
-        background: #ffffff; border: 1px solid #e7ddce; border-radius: 12px;
-        padding: 0.6rem 0.75rem; height: 100%;
-    }
-    .stat-label {font-size: 0.72rem; color: #8a8171; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;}
-    .stat-value {font-size: 0.95rem; color: #1f2937; font-weight: 700; margin-top: 0.1rem;}
-    .stat-row {display:flex; align-items:flex-start; gap:0.4rem;}
+    .stat-card {background:#fff; border:1px solid #e7ddce; border-radius:12px; padding:0.55rem 0.7rem; height:100%;}
+    .stat-label {font-size:0.68rem; color:#8a8171; font-weight:700; text-transform:uppercase; letter-spacing:0.03em;}
+    .stat-value {font-size:0.85rem; color:#1f2937; font-weight:700; margin-top:0.1rem; line-height:1.3;}
+    .stat-row {display:flex; align-items:flex-start; gap:0.35rem;}
 
-    .callout {
-        background: #e8f3ea; border: 1px solid #bfe0c6; border-radius: 12px;
-        padding: 0.85rem 1rem; margin: 0.7rem 0; display:flex; gap:0.6rem; align-items:flex-start;
-    }
+    .callout {background:#e8f3ea; border:1px solid #bfe0c6; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}
     .callout b {color:#1f4d3d;}
-    .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#334034;}
+    .callout p {margin:0.2rem 0 0 0; font-size:0.9rem; color:#334034;}
 
-    .section-title {
-        font-family: 'Merriweather', serif; font-size: 1.15rem; font-weight: 700;
-        color: #1f4d3d; margin: 0.9rem 0 0.4rem 0;
+    .section-title {display:flex; align-items:center; gap:0.4rem; font-family:'Merriweather', serif; font-size:1.1rem; font-weight:700; color:#1f4d3d; margin:0.8rem 0 0.4rem 0;}
+
+    .cat-card {background:#fff; border:1px solid #e7ddce; border-radius:12px; padding:0.75rem 0.9rem; margin-bottom:0.55rem;}
+    .cat-row {display:flex; align-items:center; gap:0.7rem;}
+    .cat-avatar {
+        width:44px; height:44px; border-radius:10px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        color:white; font-weight:800; font-size:0.95rem;
+    }
+    .cat-name {font-weight:800; font-size:1rem; color:#1f2937; margin:0;}
+    .cat-desc {color:#8a8171; font-size:0.78rem; margin:0;}
+    .cat-progress {font-size:0.78rem; color:#4f8a68; font-weight:600; margin-top:0.1rem;}
+    .cat-progress.full {color:#8a8171;}
+
+    .signee-row {
+        display:flex; align-items:center; justify-content:space-between;
+        background:#f4f9f5; border-radius:8px; padding:0.35rem 0.6rem; margin-top:0.4rem; font-size:0.85rem;
+    }
+    .signee-avatar {
+        width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+        color:white; font-size:0.65rem; font-weight:800; margin-right:0.4rem;
     }
 
-    table.food-table {width:100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 0.6rem;}
-    table.food-table th {
-        text-align:left; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.03em;
-        color:#8a8171; border-bottom: 2px solid #e7ddce; padding: 0.4rem 0.3rem;
-    }
-    table.food-table td {padding: 0.5rem 0.3rem; border-bottom: 1px solid #f0ebe0; color:#1f2937;}
-    .pill-open {background:#e8f3ea; color:#1f4d3d; padding:0.15rem 0.55rem; border-radius:999px; font-size:0.78rem; font-weight:700;}
-    .pill-done {background:#f0ebe0; color:#8a8171; padding:0.15rem 0.55rem; border-radius:999px; font-size:0.78rem; font-weight:700;}
+    div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem;}
 
-    .fam-name {font-weight: 800; font-size: 1.1rem; margin-bottom: 0.1rem; display:inline-block;}
-    .fam-members {color: #8a8171; font-size: 0.8rem; margin-bottom: 0.3rem;}
-    .field-label {color: #8a8171; font-size: 0.75rem; margin-bottom: -0.3rem; font-weight: 600;}
-    .status-yes {background:#e8f3ea; color:#1f4d3d; padding:0.12rem 0.5rem; border-radius:999px; font-size:0.78rem; font-weight:700;}
-    .status-no {background:#f0ebe0; color:#8a8171; padding:0.12rem 0.5rem; border-radius:999px; font-size:0.78rem; font-weight:700;}
-
-    div.stButton > button {border-radius: 8px; font-weight: 700; font-size: 0.95rem;}
-
-    .footer-card {
-        background: #eef3fb; border: 1px solid #c9d9ee; border-radius: 12px;
-        padding: 0.9rem 1.05rem; margin-top: 1rem; font-size: 0.9rem; color:#26344a;
-    }
-    .footer-verse {font-style: italic; color:#5a6a86; margin-top:0.4rem; text-align:right;}
-    .version-tag {text-align:center; color:#c7bfae; font-size:0.7rem; margin-top:1rem;}
+    .footer-card {background:#eef3fb; border:1px solid #c9d9ee; border-radius:12px; padding:0.9rem 1.05rem; margin-top:1rem; font-size:0.9rem; color:#26344a;}
+    .footer-flourish {font-style:italic; color:#3b6ea5; text-align:right; margin-top:0.3rem;}
+    .version-tag {text-align:center; color:#c7bfae; font-size:0.68rem; margin-top:1rem;}
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+
+def initials(name):
+    return "".join(w[0] for w in name.split()[:2]).upper()
+
 
 # ----------------------------------------------------------------------
 # Firebase
@@ -169,13 +169,8 @@ def load_event():
     if doc.exists:
         stored = doc.to_dict()
         data.update(stored)
-        fixed_food = []
-        for item in data.get("food_needed", []):
-            if isinstance(item, str):
-                fixed_food.append({"name": item, "qty": 1})
-            elif isinstance(item, dict):
-                fixed_food.append({"name": item.get("name", ""), "qty": int(item.get("qty", 1))})
-        data["food_needed"] = fixed_food
+        if "categories" in stored:
+            data["categories"] = stored["categories"]
     return data
 
 
@@ -183,301 +178,234 @@ def save_event(data):
     db.collection("meta").document("event").set(data, merge=True)
 
 
-def load_families():
-    docs = db.collection("families").stream()
+def load_signups():
+    docs = db.collection("signups").stream()
     return {d.id: d.to_dict() for d in docs}
 
 
-def save_family(family, attending, count, bringing):
-    db.collection("families").document(family).set(
-        {"attending": attending, "count": count, "bringing": bringing}
-    )
-
-
-def get_family_data(family, families_data):
-    if family in families_data:
-        return families_data[family]
-    return SEED_DEFAULTS.get(family, {"attending": False, "count": 0, "bringing": ""})
-
-
-def all_family_data():
-    fd = load_families()
+def merged_signups():
+    raw = load_signups()
     merged = {}
     for fam in FAMILIES:
-        merged[fam] = get_family_data(fam, fd)
-    return fd, merged
+        merged[fam] = raw.get(fam, SEED_SIGNUPS.get(fam))
+    return merged
 
 
-def claim_counts(merged_data):
-    counts = {}
-    for fam, d in merged_data.items():
-        b = d.get("bringing")
-        if b:
-            counts[b] = counts.get(b, 0) + 1
-    return counts
+def save_signup(family, category, count):
+    db.collection("signups").document(family).set({"category": category, "count": count})
 
 
-def food_options_for(family, food_needed, merged_data):
-    counts = claim_counts(merged_data)
-    own_pick = merged_data.get(family, {}).get("bringing", "")
-    options = [NONE_OPTION]
-    remaining_map = {NONE_OPTION: None}
-    for item in food_needed:
-        name, qty = item["name"], item["qty"]
-        if not name:
-            continue
-        claimed = counts.get(name, 0)
-        if name == own_pick:
-            claimed -= 1
-        remaining = qty - claimed
-        if remaining > 0 or name == own_pick:
-            options.append(name)
-            remaining_map[name] = max(remaining, 0)
-    return options, remaining_map
+def remove_signup(family):
+    db.collection("signups").document(family).delete()
 
 
 # ----------------------------------------------------------------------
-# Confirmation dialog
+# Sign-up dialog
 # ----------------------------------------------------------------------
-@st.dialog("Confirm your RSVP")
-def confirm_rsvp(family, attending, count, bringing):
-    st.markdown(f"Updating the RSVP for the **{family} family**.")
-    if attending:
-        st.markdown(f"Attending -- **{count}** coming")
-    else:
-        st.markdown("Not attending")
-    if bringing and bringing != NONE_OPTION:
-        st.markdown(f"Bringing: **{bringing}**")
-    st.caption("Make sure this is really your family before confirming.")
+@st.dialog("Sign up to bring something")
+def sign_up_dialog(category_name, merged):
+    st.markdown(f"Signing up for **{category_name}**")
+    family = st.selectbox("Your family", list(FAMILIES.keys()), key="dlg_family")
+    current = merged.get(family)
+    default_count = current["count"] if current else 2
+    count = st.number_input(
+        "How many attending", min_value=0, max_value=15, value=default_count, step=1, key="dlg_count"
+    )
+    if current and current["category"] != category_name:
+        st.caption(f"{family} is currently signed up for {current['category']}. Confirming moves them here.")
     c1, c2 = st.columns(2)
     if c1.button("Confirm", type="primary", use_container_width=True):
-        save_family(family, attending, count, bringing if bringing != NONE_OPTION else "")
+        save_signup(family, category_name, count)
         st.rerun()
     if c2.button("Cancel", use_container_width=True):
         st.rerun()
+    if current:
+        if st.button("Remove this family's sign-up", use_container_width=True):
+            remove_signup(family)
+            st.rerun()
 
 
 # ----------------------------------------------------------------------
 # Data
 # ----------------------------------------------------------------------
 event = load_event()
-raw_families_data, merged_families = all_family_data()
+merged = merged_signups()
 
 if "admin_open" not in st.session_state:
     st.session_state.admin_open = False
 if "admin_ok" not in st.session_state:
     st.session_state.admin_ok = False
+if "show_attendees" not in st.session_state:
+    st.session_state.show_attendees = False
 
-attending_families = [f for f, d in merged_families.items() if d.get("attending")]
-attending_people = sum(merged_families[f].get("count", 0) for f in attending_families)
+signed_families = {f: d for f, d in merged.items() if d}
+total_people = sum(d["count"] for d in signed_families.values())
 
 # ----------------------------------------------------------------------
-# Hero banner
+# Brand bar + Admin
 # ----------------------------------------------------------------------
-top_c1, top_c2 = st.columns([3.6, 1])
-with top_c2:
-    admin_clicked = st.button("Admin", key="admin_toggle_btn", use_container_width=True)
-    if admin_clicked:
+b1, b2 = st.columns([3.3, 1])
+with b1:
+    st.markdown(
+        f"""<div class="brand-row">{ICON_LEAF}
+        <div><p class="brand-name">SBC Growth Group</p><p class="brand-sub">Study &middot; Grow &middot; Belong</p></div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+with b2:
+    if st.button("Admin", key="admin_toggle_btn", use_container_width=True):
         st.session_state.admin_open = not st.session_state.admin_open
 
 if st.session_state.admin_open:
     st.markdown(
-        """<style>
-        .st-key-admin_toggle_btn button {
-            background-color: #c9a227 !important; color: #2b2109 !important;
-            border: 2px solid #8a6d16 !important;
-        }
-        </style>""",
+        """<style>.st-key-admin_toggle_btn button {background-color:#c9a227 !important; color:#2b2109 !important; border:2px solid #8a6d16 !important;}</style>""",
         unsafe_allow_html=True,
     )
 else:
     st.markdown(
-        """<style>
-        .st-key-admin_toggle_btn button {
-            background-color: #1f4d3d !important; color: #f7f3ec !important; border: none !important;
-        }
-        </style>""",
+        """<style>.st-key-admin_toggle_btn button {background-color:#1f4d3d !important; color:#f7f3ec !important; border:none !important;}</style>""",
         unsafe_allow_html=True,
     )
 
+# ----------------------------------------------------------------------
+# Hero
+# ----------------------------------------------------------------------
 next_date = event["upcoming_dates"][0] if event["upcoming_dates"] else "Date TBD"
-
 st.markdown(
     f"""<div class="hero">
-    <div class="hero-top">{ICON_BOOK}<span class="hero-brand">SBC GROWTH GROUP</span></div>
-    <div class="hero-title">Bible Study &amp; Fellowship</div>
-    <div class="hero-sub">Food Brings Us Together</div>
-    <div class="hero-tags">Good Food &nbsp;&bull;&nbsp; Great Fellowship &nbsp;&bull;&nbsp; A Deeper Walk with Christ</div>
+    <p class="hero-title">Bible Study &amp; Fellowship</p>
+    <p class="hero-sub">Food Brings Us Together</p>
+    <div class="hero-verse">"They broke bread in their homes and ate together with glad and sincere hearts."<br>-- Acts 2:46</div>
     </div>""",
     unsafe_allow_html=True,
 )
 
 # ----------------------------------------------------------------------
-# Stat cards row
+# Stat cards
 # ----------------------------------------------------------------------
-s1, s2 = st.columns(2)
-s3, s4 = st.columns(2)
+s1, s2, s3 = st.columns(3)
 with s1:
     st.markdown(
         f"""<div class="stat-card"><div class="stat-row">{ICON_CAL}
-        <div><div class="stat-label">Date</div><div class="stat-value">{next_date}</div></div>
+        <div><div class="stat-label">When</div><div class="stat-value">{next_date}<br>{event['time']}</div></div>
         </div></div>""",
         unsafe_allow_html=True,
     )
 with s2:
     st.markdown(
-        f"""<div class="stat-card"><div class="stat-row">{ICON_CLOCK}
-        <div><div class="stat-label">Time</div><div class="stat-value">{event['time']}</div></div>
+        f"""<div class="stat-card"><div class="stat-row">{ICON_PIN}
+        <div><div class="stat-label">Where</div><div class="stat-value">{event['address']}</div></div>
         </div></div>""",
         unsafe_allow_html=True,
     )
 with s3:
     st.markdown(
-        f"""<div class="stat-card"><div class="stat-row">{ICON_PIN}
-        <div><div class="stat-label">Location</div><div class="stat-value">{event['address']}</div></div>
-        </div></div>""",
-        unsafe_allow_html=True,
-    )
-with s4:
-    st.markdown(
         f"""<div class="stat-card"><div class="stat-row">{ICON_PEOPLE}
-        <div><div class="stat-label">Families Attending</div>
-        <div class="stat-value">{len(attending_families)} families ({attending_people} people)</div></div>
+        <div><div class="stat-label">Attending</div><div class="stat-value">{len(signed_families)} families<br>({total_people} people)</div></div>
         </div></div>""",
         unsafe_allow_html=True,
     )
 
-more_dates = event["upcoming_dates"][1:]
-if more_dates or event["host_food"]:
-    extra_bits = []
-    if more_dates:
-        extra_bits.append("Also coming up: " + "; ".join(more_dates))
-    if event["host_food"]:
-        extra_bits.append(f"Host is bringing: {event['host_food']}")
-    st.caption("  |  ".join(extra_bits))
+if len(event["upcoming_dates"]) > 1:
+    st.caption("Also coming up: " + "; ".join(event["upcoming_dates"][1:]))
 
 # ----------------------------------------------------------------------
-# Welcome callout
+# Callout
 # ----------------------------------------------------------------------
 st.markdown(
     f"""<div class="callout">{ICON_LEAF}
     <p><b>Let's Share a Meal!</b><br>
-    We're so excited to gather for Bible study and fellowship. Pick a family below to
-    RSVP and choose what you'll bring. Thank you for helping make this a special time together!</p>
+    Sign your family up below to bring a dish, drink, or item. Signing up also lets us know
+    you're planning to be there -- thank you for helping make this a special time together!</p>
     </div>""",
     unsafe_allow_html=True,
 )
 
 # ----------------------------------------------------------------------
-# Food needed status table (read-only for everyone)
+# Food Sign Up section
 # ----------------------------------------------------------------------
-st.markdown("<div class='section-title'>Food Needed</div>", unsafe_allow_html=True)
+h1, h2 = st.columns([3, 1.3])
+with h1:
+    st.markdown(f"<div class='section-title'>{ICON_UTENSILS} Food Sign Up</div>", unsafe_allow_html=True)
+with h2:
+    if st.button("View Attendees", key="view_attendees_btn", use_container_width=True):
+        st.session_state.show_attendees = not st.session_state.show_attendees
 
-if event["food_needed"]:
-    counts = claim_counts(merged_families)
-    rows_html = ""
-    for item in event["food_needed"]:
-        if not item["name"]:
-            continue
-        claimed = counts.get(item["name"], 0)
-        remaining = max(item["qty"] - claimed, 0)
-        who = [f for f, d in merged_families.items() if d.get("bringing") == item["name"]]
-        who_text = ", ".join(who) if who else "&mdash;"
-        pill = f"<span class='pill-open'>{remaining} open</span>" if remaining > 0 else "<span class='pill-done'>All claimed</span>"
-        rows_html += f"<tr><td><b>{item['name']}</b></td><td>{item['qty']} needed</td><td>{pill}</td><td>{who_text}</td></tr>"
-    st.markdown(
-        f"""<table class="food-table">
-        <tr><th>Item</th><th>Needed</th><th>Status</th><th>Who's Bringing It</th></tr>
-        {rows_html}
-        </table>""",
-        unsafe_allow_html=True,
-    )
-else:
-    st.caption("Nothing posted yet -- check back soon.")
+if st.session_state.show_attendees:
+    if signed_families:
+        for fam, d in signed_families.items():
+            color = FAMILY_COLORS.get(fam, "#1f2937")
+            st.markdown(
+                f"""<div class="signee-row">
+                <span><span class="signee-avatar" style="background:{color};">{initials(fam)}</span>
+                <b>{fam} Family</b> ({d['count']}) -- {d['category']}</span>
+                </div>""",
+                unsafe_allow_html=True,
+            )
+    else:
+        st.caption("No one has signed up yet.")
 
-# ----------------------------------------------------------------------
-# Family RSVP cards
-# ----------------------------------------------------------------------
-st.markdown("<div class='section-title'>Family RSVPs</div>", unsafe_allow_html=True)
+for cat in event["categories"]:
+    name, desc, slots = cat["name"], cat.get("desc", ""), cat.get("slots", 1)
+    matches = [f for f, d in signed_families.items() if d["category"] == name]
+    filled = len(matches)
+    remaining = max(slots - filled, 0)
+    color = "#5b3a29"
 
-for family, members in FAMILIES.items():
-    existing = merged_families[family]
-    color = FAMILY_COLORS.get(family, "#1f2937")
-    card_key = f"card_{family}"
-
-    st.markdown(
-        f"""<style>
-        .st-key-{card_key} {{
-            border: none !important;
-            border-left: 6px solid {color} !important;
-            border-radius: 10px !important;
-            padding: 0.7rem 0.9rem !important;
-            margin-bottom: 0.6rem !important;
-            background: #ffffff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        }}
-        </style>""",
-        unsafe_allow_html=True,
-    )
-
-    with st.container(border=True, key=card_key):
-        pill = "<span class='status-yes'>Attending</span>" if existing.get("attending") else "<span class='status-no'>No RSVP yet</span>"
+    st.markdown('<div class="cat-card">', unsafe_allow_html=True)
+    cc1, cc2 = st.columns([3, 1.1])
+    with cc1:
+        progress_class = "full" if remaining == 0 else ""
         st.markdown(
-            f"<span class='fam-name' style='color:{color};'>{family} Family</span> &nbsp; {pill}"
-            f"<div class='fam-members'>{' &amp; '.join(members)}</div>",
+            f"""<div class="cat-row">
+            <div class="cat-avatar" style="background:{color};">{name[:2].upper()}</div>
+            <div><p class="cat-name">{name}</p><p class="cat-desc">{desc}</p>
+            <p class="cat-progress {progress_class}">{filled} / {slots} signed up</p></div>
+            </div>""",
             unsafe_allow_html=True,
         )
-
-        r1c1, r1c2 = st.columns([1, 1.4])
-        with r1c1:
-            st.markdown("<div class='field-label'>Attending</div>", unsafe_allow_html=True)
-            attending = st.checkbox(
-                "Attending", value=bool(existing.get("attending", False)),
-                key=f"chk_{family}", label_visibility="collapsed",
+    with cc2:
+        btn_label = "Full -- Sign Up" if remaining == 0 else "Sign Up"
+        if st.button(btn_label, key=f"signup_{name}", use_container_width=True):
+            sign_up_dialog(name, merged)
+        btn_key = f"signup_{name}"
+        if remaining == 0:
+            st.markdown(
+                f"""<style>.st-key-{btn_key} button {{background-color:#f0ebe0 !important; color:#8a8171 !important; border:none !important;}}</style>""",
+                unsafe_allow_html=True,
             )
-        with r1c2:
-            st.markdown("<div class='field-label'>How many coming</div>", unsafe_allow_html=True)
-            count_text = st.text_input(
-                "How many", value=str(existing.get("count", 0)),
-                key=f"cnt_{family}", label_visibility="collapsed",
+        else:
+            st.markdown(
+                f"""<style>.st-key-{btn_key} button {{background-color:#4f8a68 !important; color:white !important; border:none !important;}}</style>""",
+                unsafe_allow_html=True,
             )
 
-        options, remaining_map = food_options_for(family, event["food_needed"], merged_families)
-        st.markdown("<div class='field-label'>Bringing</div>", unsafe_allow_html=True)
-        existing_bringing = existing.get("bringing", "")
-        default_index = options.index(existing_bringing) if existing_bringing in options else 0
-
-        def _fmt(name, rm=remaining_map):
-            if name == NONE_OPTION:
-                return name
-            r = rm.get(name)
-            return f"{name} ({r} left)" if r is not None else name
-
-        bringing = st.selectbox(
-            "Bringing", options=options, index=default_index, format_func=_fmt,
-            key=f"food_{family}", label_visibility="collapsed",
+    for fam in matches:
+        d = signed_families[fam]
+        fcolor = FAMILY_COLORS.get(fam, "#1f2937")
+        st.markdown(
+            f"""<div class="signee-row">
+            <span><span class="signee-avatar" style="background:{fcolor};">{initials(fam)}</span>
+            The {fam} Family ({d['count']})</span>
+            </div>""",
+            unsafe_allow_html=True,
         )
-
-        if st.button("Save RSVP", key=f"save_{family}", use_container_width=True):
-            try:
-                count_val = int(count_text)
-            except ValueError:
-                count_val = 0
-            confirm_rsvp(family, attending, count_val, bringing)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
 # Footer
 # ----------------------------------------------------------------------
 st.markdown(
-    """<div class="footer-card">
-    <b>Thank you!</b> Your willingness to RSVP and bring a dish helps make our
-    Growth Group a warm and welcoming place for everyone.
-    <div class="footer-verse">"For where two or three gather in my name, there am I with them."<br>Matthew 18:20</div>
+    f"""<div class="footer-card">
+    <div style="display:flex; align-items:flex-start; gap:0.5rem;">{ICON_HEART}
+    <div><b>Thank you!</b> Your willingness to serve helps make our Growth Group a warm
+    and welcoming place for everyone.</div></div>
+    <div class="footer-flourish">All are welcome!</div>
     </div>""",
     unsafe_allow_html=True,
 )
 
-st.markdown("<div class='version-tag'>v3.0</div>", unsafe_allow_html=True)
+st.markdown("<div class='version-tag'>v4.0</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
 # Admin panel
@@ -505,37 +433,34 @@ if st.session_state.admin_open:
                 "Upcoming dates (one per line, soonest first)",
                 value="\n".join(event["upcoming_dates"]), height=100,
             )
-            host_food = st.text_area("What is the host bringing?", value=event["host_food"], height=70)
             if st.form_submit_button("Save details"):
                 dates_list = [d.strip() for d in dates_text.splitlines() if d.strip()]
-                save_event({
-                    "address": new_address,
-                    "time": new_time,
-                    "upcoming_dates": dates_list,
-                    "host_food": host_food,
-                })
+                save_event({"address": new_address, "time": new_time, "upcoming_dates": dates_list})
                 st.rerun()
 
-        with st.form("food_form"):
-            st.markdown("**Food needed this week** (set quantity needed per item)")
-            existing_rows = event["food_needed"] if event["food_needed"] else [{"name": "", "qty": 1}]
-            df = pd.DataFrame(existing_rows)
+        with st.form("categories_form"):
+            st.markdown("**Food categories** (edit names, descriptions, and how many families can sign up)")
+            df = pd.DataFrame(event["categories"])
             edited = st.data_editor(
                 df, num_rows="dynamic", hide_index=True, use_container_width=True,
                 column_config={
-                    "name": st.column_config.TextColumn("Item"),
-                    "qty": st.column_config.NumberColumn("Qty Needed", min_value=0, step=1),
+                    "name": st.column_config.TextColumn("Category"),
+                    "desc": st.column_config.TextColumn("Description"),
+                    "slots": st.column_config.NumberColumn("Slots", min_value=0, step=1),
                 },
-                key="food_editor",
+                key="cat_editor",
             )
-            if st.form_submit_button("Save food list"):
-                items = []
+            if st.form_submit_button("Save categories"):
+                cats = []
                 for _, row in edited.iterrows():
                     name = str(row.get("name", "")).strip()
                     if name:
-                        qty = int(row.get("qty", 1) or 1)
-                        items.append({"name": name, "qty": qty})
-                save_event({"food_needed": items})
+                        cats.append({
+                            "name": name,
+                            "desc": str(row.get("desc", "") or ""),
+                            "slots": int(row.get("slots", 1) or 1),
+                        })
+                save_event({"categories": cats})
                 st.rerun()
 
         st.divider()
