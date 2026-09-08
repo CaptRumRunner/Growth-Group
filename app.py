@@ -48,11 +48,16 @@ TYPICAL_CATEGORIES = [
     "Dessert", "Drinks", "Snacks", "Plates / Utensils", "Other",
 ]
 
+DEFAULT_HERO_IMAGE = (
+    "https://images.unsplash.com/photo-1566392062329-9935b9a7c950"
+    "?fm=jpg&q=70&w=1600&auto=format&fit=crop"
+)  # "Open bible with leaves on top" by Sixteen Miles Out -- Unsplash License (free to use)
+
 DEFAULT_EVENT = {
     "address": "17136 Mark Dr, Macomb, MI 48044",
     "time": "5:00 PM",
     "upcoming_dates": [],  # list of ISO "YYYY-MM-DD" strings
-    "hero_image_url": "",
+    "hero_image_url": DEFAULT_HERO_IMAGE,
     "callout_text": (
         "Sign your family up below to bring a dish, drink, or item. Signing up also "
         "lets us know you're planning to be there -- thank you for helping make this "
@@ -169,6 +174,17 @@ st.markdown(
     '.signee-detail {color:#4d473b;}'
     'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem;}'
     '.version-tag {text-align:center; color:#c7bfae; font-size:0.68rem; margin-top:1rem;}'
+    # --- Hard overrides so native widgets stay legible even if the deployed
+    # config.toml theme isn't the light one (belt-and-suspenders fix). ---
+    '[data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {background-color:#f7f3ec !important;}'
+    '.stTextInput input, .stNumberInput input, .stTextArea textarea, .stDateInput input {'
+    'background-color:#ffffff !important; color:#1f2937 !important; border:1px solid #d9cdb8 !important;}'
+    '[data-baseweb="select"] * {background-color:#ffffff !important; color:#1f2937 !important;}'
+    '[data-testid="stForm"] {background-color:#ffffff !important; border:1px solid #e7ddce !important; '
+    'border-radius:12px !important; padding:1rem !important;}'
+    '.stMarkdown p, .stMarkdown strong, .stMarkdown li, .stCaption, label, '
+    '.stCheckbox label p, .stRadio label p {color:#1f2937 !important;}'
+    'div.stButton > button {background-color:#1f4d3d; color:#f7f3ec;}'
     '</style>',
     unsafe_allow_html=True,
 )
@@ -236,6 +252,23 @@ def load_event():
         data.update(stored)
         if "categories" in stored:
             data["categories"] = stored["categories"]
+
+    # Self-heal: drop any legacy free-text dates that aren't real ISO dates
+    # (e.g. old "10/11/10/25" style strings from before the date picker).
+    valid_dates = []
+    for d in data.get("upcoming_dates", []):
+        try:
+            datetime.strptime(d, "%Y-%m-%d")
+            valid_dates.append(d)
+        except (ValueError, TypeError):
+            pass
+    data["upcoming_dates"] = sorted(valid_dates)
+
+    # Fall back to the default background photo if none was set (or was
+    # explicitly cleared), rather than showing nothing.
+    if not data.get("hero_image_url"):
+        data["hero_image_url"] = DEFAULT_HERO_IMAGE
+
     return data
 
 
