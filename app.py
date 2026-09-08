@@ -131,6 +131,13 @@ st.markdown(
     '<style>'
     "@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Inter:wght@400;600;700;800&display=swap');"
     '#MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}'
+    # Override Streamlit's own theme variables directly -- this is the
+    # architecturally correct fix (native widgets reference these variables
+    # internally), rather than chasing individual widget selectors.
+    ':root, .stApp {'
+    '--background-color:#f7f3ec !important; --secondary-background-color:#ffffff !important; '
+    '--text-color:#1f2937 !important; --primary-color:#1f4d3d !important;'
+    '}'
     'html, body, .stApp { background-color: #f7f3ec !important; }'
     "html, body, [class*='css'] { font-family: 'Inter', sans-serif; color:#1f2937; }"
     '.block-container {padding-top: 0.5rem; padding-bottom: 1.6rem; max-width: 560px;}'
@@ -139,58 +146,53 @@ st.markdown(
     '.brand-sub {font-size:0.75rem; color:#6b6355; margin-top:-0.1rem;}'
     '.st-key-admin_toggle_btn button {padding: 0.2rem 0.7rem !important; font-size: 0.78rem !important; min-height: 0 !important; margin-top: 0.35rem;}'
     '.hero {position: relative; border-radius: 16px; overflow: hidden; margin: 0.6rem 0 0.8rem 0; color:#f7f3ec; min-height: 190px; background: linear-gradient(120deg, #5b3a29 0%, #7a5137 45%, #9c7248 100%); background-size: cover; background-position: center;}'
-    '.hero-overlay {position: absolute; inset: 0; z-index: 2; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, rgba(15,10,6,0.72), rgba(15,10,6,0.85)); padding: 1.3rem 1.2rem;}'
-    ".hero-title {font-family:'Merriweather', serif; font-size:1.7rem; font-weight:900; line-height:1.2; margin:0; text-shadow: 0 2px 6px rgba(0,0,0,0.35);}"
-    '.hero-sub {font-size:1.02rem; opacity:0.96; margin: 0.15rem 0 0.6rem 0; text-shadow: 0 1px 4px rgba(0,0,0,0.3);}'
-    '.hero-verse {font-size:0.85rem; font-style:italic; opacity:0.94; border-left:3px solid #d4af37; padding-left:0.6rem;}'
+    '.hero-overlay {position: absolute; inset: 0; z-index: 2; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, rgba(15,10,6,0.78), rgba(15,10,6,0.88)); padding: 1.3rem 1.2rem;}'
+    ".hero-title {font-family:'Merriweather', serif; font-size:1.7rem; font-weight:900; line-height:1.2; margin:0; color:#f7f3ec !important; text-shadow: 0 2px 6px rgba(0,0,0,0.5);}"
+    '.hero-sub {font-size:1.02rem; opacity:0.96; margin: 0.15rem 0 0.6rem 0; color:#f7f3ec !important; text-shadow: 0 1px 4px rgba(0,0,0,0.5);}'
+    '.hero-verse {font-size:0.85rem; font-style:italic; color:#f7f3ec !important; opacity:0.96; border-left:3px solid #d4af37; padding-left:0.6rem;}'
     '.hero-deco {position:absolute; right:-10px; bottom:-10px; opacity:0.18; z-index:1;}'
     '.stat-card {background:#fff; border:1px solid #e7ddce; border-radius:12px; padding:0.65rem 0.75rem; height:100%;}'
     '.stat-label {font-size:0.7rem; color:#6b6355; font-weight:700; text-transform:uppercase; letter-spacing:0.03em;}'
-    '.stat-value {font-size:0.92rem; color:#1a1f16; font-weight:800; margin-top:0.15rem; line-height:1.35;}'
+    '.stat-value {font-size:0.92rem; color:#1a1f16 !important; font-weight:800; margin-top:0.15rem; line-height:1.35;}'
     '.stat-row {display:flex; align-items:flex-start; gap:0.4rem;}'
-    '.section-title {display:flex; align-items:center; gap:0.4rem; font-family:"Merriweather", serif; font-size:1.1rem; font-weight:700; color:#1f4d3d; margin:0.8rem 0 0.4rem 0;}'
+    '.section-title {display:flex; align-items:center; gap:0.4rem; font-family:"Merriweather", serif; font-size:1.1rem; font-weight:700; color:#1f4d3d !important; margin:0.8rem 0 0.4rem 0;}'
     '.dates-strip {display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.3rem;}'
     '.date-pill {flex: 0 0 auto; min-width: 100px; text-align:center; border-radius:10px; padding:0.5rem 0.6rem; border:1px solid #e7ddce; background:#fff;}'
     '.date-pill.next {background:#e8f3ea; border-color:#8fc79c;}'
-    '.date-pill .dow {font-size:0.72rem; color:#8a8171; font-weight:700; text-transform:uppercase;}'
-    '.date-pill.next .dow {color:#1f4d3d;}'
-    '.date-pill .dnum {font-size:0.85rem; font-weight:800; color:#1a1f16; margin-top:0.15rem;}'
+    '.date-pill .dow {font-size:0.72rem; color:#8a8171 !important; font-weight:700; text-transform:uppercase;}'
+    '.date-pill.next .dow {color:#1f4d3d !important;}'
+    '.date-pill .dnum {font-size:0.85rem; font-weight:800; color:#1a1f16 !important; margin-top:0.15rem;}'
     '.allergy-card {background:#fff7e6; border:1px solid #f0d38a; border-radius:12px; padding:0.75rem 1rem; margin:0.6rem 0;}'
-    '.allergy-title {display:flex; align-items:center; gap:0.4rem; font-weight:800; color:#92400e; font-size:0.95rem; margin-bottom:0.3rem;}'
-    '.allergy-row {font-size:0.87rem; color:#5c4a1f; margin-top:0.2rem;}'
+    '.allergy-title {display:flex; align-items:center; gap:0.4rem; font-weight:800; color:#92400e !important; font-size:0.95rem; margin-bottom:0.3rem;}'
+    '.allergy-row {font-size:0.87rem; color:#5c4a1f !important; margin-top:0.2rem;}'
     '.callout {background:#e8f3ea; border:1px solid #bfe0c6; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}'
-    '.callout b {color:#1f4d3d;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#2a352c;}'
-    '.cat-card {background:#fff; border:1px solid #e7ddce; border-radius:12px; padding:0.75rem 0.9rem; margin-bottom:0.55rem;}'
+    '.callout b {color:#1f4d3d !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#2a352c !important;}'
+    '.cat-card {background:#fff; border:1.5px solid #c9bda3; border-radius:14px; padding:0.85rem 1rem; margin-bottom:0.7rem; box-shadow: 0 2px 6px rgba(60,45,25,0.08);}'
     '.cat-row {display:flex; align-items:center; gap:0.7rem;}'
     '.cat-avatar {width:44px; height:44px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#5b3a29;}'
-    '.cat-name {font-weight:800; font-size:1.02rem; color:#1a1f16; margin:0;}'
-    '.cat-desc {color:#4d473b; font-size:0.85rem; margin:0.1rem 0 0 0;}'
-    '.cat-progress {font-size:0.8rem; color:#3d6b52; font-weight:700; margin-top:0.15rem;}'
-    '.cat-progress.full {color:#6b6355;}'
-    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:#f4f9f5; border-radius:8px; padding:0.4rem 0.65rem; margin-top:0.4rem; font-size:0.87rem;}'
+    '.cat-name {font-weight:800; font-size:1.05rem; color:#1a1f16 !important; margin:0;}'
+    '.cat-desc {color:#4d473b !important; font-size:0.85rem; margin:0.1rem 0 0 0;}'
+    '.cat-progress {font-size:0.8rem; color:#3d6b52 !important; font-weight:700; margin-top:0.15rem;}'
+    '.cat-progress.full {color:#6b6355 !important;}'
+    '.who-label {font-size:0.72rem; font-weight:700; color:#8a8171 !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.5rem;}'
+    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:#eef5f0; border:1px solid #cfe3d4; border-radius:8px; padding:0.45rem 0.7rem; margin-top:0.35rem; font-size:0.9rem;}'
     '.signee-left {display:flex; align-items:center;}'
-    '.signee-avatar {width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:white; font-size:0.68rem; font-weight:800; margin-right:0.5rem; flex-shrink:0;}'
-    '.signee-name {font-weight:700; color:#1a1f16;}'
-    '.signee-detail {color:#4d473b;}'
-    'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem;}'
+    '.signee-avatar {width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:white !important; font-size:0.7rem; font-weight:800; margin-right:0.55rem; flex-shrink:0;}'
+    '.signee-name {font-weight:800; color:#14261d !important;}'
+    '.signee-detail {color:#3d453e !important;}'
+    'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem; background-color:#1f4d3d; color:#f7f3ec;}'
     '.version-tag {text-align:center; color:#c7bfae; font-size:0.68rem; margin-top:1rem;}'
-    # --- Hard overrides so native widgets stay legible even if the deployed
-    # config.toml theme isn't the light one (belt-and-suspenders fix). ---
+    # --- Fallback overrides for native widget chrome (in case the theme
+    # variables above aren't picked up everywhere). ---
     '[data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {background-color:#f7f3ec !important;}'
     '.stTextInput input, .stNumberInput input, .stTextArea textarea, .stDateInput input {'
     'background-color:#ffffff !important; color:#1f2937 !important; border:1px solid #d9cdb8 !important;}'
     '[data-baseweb="select"] * {background-color:#ffffff !important; color:#1f2937 !important;}'
     '[data-testid="stForm"] {background-color:#ffffff !important; border:1px solid #e7ddce !important; '
     'border-radius:12px !important; padding:1rem !important;}'
-    '.stMarkdown p, .stMarkdown strong, .stMarkdown li, .stCaption, label, '
-    '.stCheckbox label p, .stRadio label p {color:#1f2937 !important;}'
-    'div.stButton > button {background-color:#1f4d3d; color:#f7f3ec;}'
-    'h1, h2, h3, h4, h5, h6 {color:#1f2937;}'
     '.stAlert, .stAlert p, .stSuccess, .stError, .stCaption, .stCaption p {color:#1f2937 !important;}'
     # --- Dialogs/modals and date-picker calendars render in their own portal
-    # layer, outside our normal content flow -- cover every selector variant
-    # Streamlit/BaseWeb might use so the PIN box, sign-up form, and calendar
-    # month-navigation arrows are never dark-on-dark again. ---
+    # layer -- cover every selector variant Streamlit/BaseWeb might use. ---
     '[data-testid="stDialog"], div[role="dialog"], [data-testid*="Modal"], [data-testid*="modal"] '
     '{background-color:#ffffff !important;}'
     '[data-testid="stDialog"] *, div[role="dialog"] *, [data-testid*="Modal"] *, [data-testid*="modal"] * '
@@ -733,6 +735,8 @@ for idx, cat in enumerate(event["categories"]):
                 unsafe_allow_html=True,
             )
 
+    if matches:
+        st.markdown('<div class="who-label">Who\'s bringing it</div>', unsafe_allow_html=True)
     for fam in matches:
         d = signed_families[fam]
         fcolor = FAMILY_COLORS.get(fam, "#1f2937")
