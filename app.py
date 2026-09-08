@@ -139,7 +139,7 @@ st.markdown(
     '.brand-sub {font-size:0.75rem; color:#6b6355; margin-top:-0.1rem;}'
     '.st-key-admin_toggle_btn button {padding: 0.2rem 0.7rem !important; font-size: 0.78rem !important; min-height: 0 !important; margin-top: 0.35rem;}'
     '.hero {position: relative; border-radius: 16px; overflow: hidden; margin: 0.6rem 0 0.8rem 0; color:#f7f3ec; min-height: 150px; background: linear-gradient(120deg, #5b3a29 0%, #7a5137 45%, #9c7248 100%); background-size: cover; background-position: center;}'
-    '.hero-overlay {position: relative; z-index: 2; background: linear-gradient(180deg, rgba(30,20,12,0.35), rgba(30,20,12,0.65)); padding: 1.3rem 1.2rem;}'
+    '.hero-overlay {position: relative; z-index: 2; background: linear-gradient(180deg, rgba(15,10,6,0.72), rgba(15,10,6,0.85)); padding: 1.3rem 1.2rem;}'
     ".hero-title {font-family:'Merriweather', serif; font-size:1.7rem; font-weight:900; line-height:1.2; margin:0; text-shadow: 0 2px 6px rgba(0,0,0,0.35);}"
     '.hero-sub {font-size:1.02rem; opacity:0.96; margin: 0.15rem 0 0.6rem 0; text-shadow: 0 1px 4px rgba(0,0,0,0.3);}'
     '.hero-verse {font-size:0.85rem; font-style:italic; opacity:0.94; border-left:3px solid #d4af37; padding-left:0.6rem;}'
@@ -185,16 +185,30 @@ st.markdown(
     '.stMarkdown p, .stMarkdown strong, .stMarkdown li, .stCaption, label, '
     '.stCheckbox label p, .stRadio label p {color:#1f2937 !important;}'
     'div.stButton > button {background-color:#1f4d3d; color:#f7f3ec;}'
-    # --- Dialog/modal popups render in their own layer -- force them light too. ---
-    '[data-testid="stDialog"] {background-color:#ffffff !important;}'
-    '[data-testid="stDialog"] * {color:#1f2937 !important;}'
-    '[data-testid="stDialog"] h1, [data-testid="stDialog"] h2, [data-testid="stDialog"] h3 '
-    '{color:#1f4d3d !important;}'
+    'h1, h2, h3, h4, h5, h6 {color:#1f2937;}'
+    '.stAlert, .stAlert p, .stSuccess, .stError, .stCaption, .stCaption p {color:#1f2937 !important;}'
+    # --- Dialogs/modals and date-picker calendars render in their own portal
+    # layer, outside our normal content flow -- cover every selector variant
+    # Streamlit/BaseWeb might use so the PIN box, sign-up form, and calendar
+    # month-navigation arrows are never dark-on-dark again. ---
+    '[data-testid="stDialog"], div[role="dialog"], [data-testid*="Modal"], [data-testid*="modal"] '
+    '{background-color:#ffffff !important;}'
+    '[data-testid="stDialog"] *, div[role="dialog"] *, [data-testid*="Modal"] *, [data-testid*="modal"] * '
+    '{color:#1f2937 !important;}'
+    '[data-testid="stDialog"] h1, [data-testid="stDialog"] h2, [data-testid="stDialog"] h3, '
+    'div[role="dialog"] h1, div[role="dialog"] h2, div[role="dialog"] h3 {color:#1f4d3d !important;}'
     '[data-testid="stDialog"] input, [data-testid="stDialog"] textarea, '
-    '[data-testid="stDialog"] [data-baseweb="select"] * '
+    'div[role="dialog"] input, div[role="dialog"] textarea, '
+    '[data-testid="stDialog"] [data-baseweb="select"] *, div[role="dialog"] [data-baseweb="select"] * '
     '{background-color:#ffffff !important; color:#1f2937 !important; border-color:#d9cdb8 !important;}'
-    '[data-testid="stDialog"] div.stButton > button '
+    '[data-testid="stDialog"] div.stButton > button, div[role="dialog"] div.stButton > button '
     '{background-color:#1f4d3d !important; color:#ffffff !important; border:none !important;}'
+    '[data-baseweb="popover"], [data-baseweb="calendar"] '
+    '{background-color:#ffffff !important; color:#1f2937 !important;}'
+    '[data-baseweb="calendar"] *, [data-baseweb="popover"] * {color:#1f2937 !important;}'
+    '[data-baseweb="calendar"] button svg, [data-baseweb="popover"] button svg '
+    '{fill:#1f4d3d !important; stroke:#1f4d3d !important; opacity:1 !important;}'
+    '[data-baseweb="calendar"] button {background-color:#ffffff !important;}'
     '</style>',
     unsafe_allow_html=True,
 )
@@ -425,7 +439,7 @@ def edit_dates_dialog(event):
 @st.dialog("Edit Category")
 def edit_category_dialog(event, idx):
     cat = event["categories"][idx]
-    options = ["(no type set)"] + TYPICAL_CATEGORIES
+    options = ["Not set yet"] + TYPICAL_CATEGORIES
     current_index = options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
     name = st.selectbox("Category type", options=options, index=current_index)
     desc = st.text_input("Description", value=cat.get("desc", ""))
@@ -433,7 +447,7 @@ def edit_category_dialog(event, idx):
     c1, c2, c3 = st.columns(3)
     if c1.button("Save", type="primary", use_container_width=True):
         cats = [dict(c) for c in event["categories"]]
-        cats[idx] = {"name": "" if name == "(no type set)" else name, "desc": desc, "slots": int(qty)}
+        cats[idx] = {"name": "" if name == "Not set yet" else name, "desc": desc, "slots": int(qty)}
         save_event({"categories": cats})
         st.rerun()
     if c2.button("Remove", use_container_width=True):
@@ -446,14 +460,14 @@ def edit_category_dialog(event, idx):
 
 @st.dialog("Add Category")
 def add_category_dialog(event):
-    options = ["(no type set)"] + TYPICAL_CATEGORIES
+    options = ["Not set yet"] + TYPICAL_CATEGORIES
     name = st.selectbox("Category type", options=options)
     desc = st.text_input("Description", value="")
     qty = st.number_input("Qty needed", min_value=0, max_value=50, value=2, step=1)
     c1, c2 = st.columns(2)
     if c1.button("Add", type="primary", use_container_width=True):
         cats = [dict(c) for c in event["categories"]]
-        cats.append({"name": "" if name == "(no type set)" else name, "desc": desc, "slots": int(qty)})
+        cats.append({"name": "" if name == "Not set yet" else name, "desc": desc, "slots": int(qty)})
         save_event({"categories": cats})
         st.rerun()
     if c2.button("Cancel", use_container_width=True):
@@ -674,7 +688,7 @@ if st.session_state.show_attendees:
 
 for idx, cat in enumerate(event["categories"]):
     name, desc, slots = cat["name"], cat.get("desc", ""), cat.get("slots", 1)
-    display_name = name if name else "(no type set)"
+    display_name = name if name else "Not set yet"
     matches = [f for f, d in signed_families.items() if d["category"] == name]
     filled = len(matches)
     remaining = max(slots - filled, 0)
@@ -756,31 +770,53 @@ if admin_visible:
         "the welcome message, and each food category above for quick edits."
     )
 
-    with st.form("bulk_food_form"):
-        st.markdown("**Food Needed This Week** (overview -- adjust and save all at once)")
-        name_options = ["(no type set)"] + TYPICAL_CATEGORIES
-        edited_rows = []
-        for i, cat in enumerate(event["categories"]):
-            rc1, rc2, rc3 = st.columns([1.4, 2, 1])
-            with rc1:
-                cur_idx = name_options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
-                chosen_name = st.selectbox(
-                    "Category", options=name_options, index=cur_idx,
-                    key=f"bulk_name_{i}", label_visibility="collapsed",
-                )
-            with rc2:
-                d = st.text_input(
-                    "Description", value=cat.get("desc", ""), key=f"bulk_desc_{i}", label_visibility="collapsed"
-                )
-            with rc3:
-                q = st.number_input(
-                    "Qty", min_value=0, max_value=50, value=int(cat.get("slots", 1)),
-                    step=1, key=f"bulk_qty_{i}", label_visibility="collapsed",
-                )
-            final_name = "" if chosen_name == "(no type set)" else chosen_name
-            edited_rows.append({"name": final_name, "desc": d, "slots": int(q)})
-        if st.form_submit_button("Save all quantities"):
-            save_event({"categories": edited_rows})
+    st.markdown("**Food Needed This Week** (add, edit, or remove categories directly)")
+    name_options = ["Not set yet"] + TYPICAL_CATEGORIES
+    for i, cat in enumerate(event["categories"]):
+        rc1, rc2, rc3, rc4 = st.columns([1.4, 1.7, 0.8, 0.8])
+        with rc1:
+            cur_idx = name_options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
+            chosen_name = st.selectbox(
+                "Category", options=name_options, index=cur_idx,
+                key=f"bulk_name_{i}", label_visibility="collapsed",
+            )
+        with rc2:
+            d = st.text_input(
+                "Description", value=cat.get("desc", ""), key=f"bulk_desc_{i}", label_visibility="collapsed"
+            )
+        with rc3:
+            q = st.number_input(
+                "Qty", min_value=0, max_value=50, value=int(cat.get("slots", 1)),
+                step=1, key=f"bulk_qty_{i}", label_visibility="collapsed",
+            )
+        with rc4:
+            row_key = f"bulk_row_btns_{i}"
+            rb1, rb2 = st.columns(2)
+            if rb1.button("Save", key=f"bulk_save_{i}", use_container_width=True):
+                final_name = "" if chosen_name == "Not set yet" else chosen_name
+                cats = [dict(c) for c in event["categories"]]
+                cats[i] = {"name": final_name, "desc": d, "slots": int(q)}
+                save_event({"categories": cats})
+                st.rerun()
+            if rb2.button("Del", key=f"bulk_del_{i}", use_container_width=True):
+                cats = [dict(c) for j, c in enumerate(event["categories"]) if j != i]
+                save_event({"categories": cats})
+                st.rerun()
+            small_remove_css(f"bulk_del_{i}")
+
+    st.markdown("*Add a new category:*")
+    ac1, ac2, ac3, ac4 = st.columns([1.4, 1.7, 0.8, 0.8])
+    with ac1:
+        new_name = st.selectbox("New category", options=name_options, key="new_cat_name", label_visibility="collapsed")
+    with ac2:
+        new_desc = st.text_input("New description", value="", key="new_cat_desc", label_visibility="collapsed")
+    with ac3:
+        new_qty = st.number_input("New qty", min_value=0, max_value=50, value=2, step=1, key="new_cat_qty", label_visibility="collapsed")
+    with ac4:
+        if st.button("Add", key="new_cat_add_btn", use_container_width=True):
+            cats = [dict(c) for c in event["categories"]]
+            cats.append({"name": "" if new_name == "Not set yet" else new_name, "desc": new_desc, "slots": int(new_qty)})
+            save_event({"categories": cats})
             st.rerun()
 
     st.divider()
