@@ -36,11 +36,11 @@ FAMILIES = {
 }
 
 FAMILY_COLORS = {
-    "Griffith": "#d97706",
-    "Crissman": "#e0574a",
-    "Lee": "#16a37a",
-    "Russell": "#4f6ef7",
-    "Siefert": "#a855c7",
+    "Griffith": "#f2b134",
+    "Crissman": "#ef6f61",
+    "Lee": "#34d399",
+    "Russell": "#60a5fa",
+    "Siefert": "#c084fc",
 }
 
 TYPICAL_CATEGORIES = [
@@ -76,12 +76,12 @@ DEFAULT_EVENT = {
 # ----------------------------------------------------------------------
 # Icons -- single-line SVG strings only (multi-line breaks HTML rendering)
 # ----------------------------------------------------------------------
-ICON_LEAF = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0f6b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 11 13.6 12 12"></path></svg>'
-ICON_CAL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f6b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
-ICON_PIN = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f6b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
-ICON_PEOPLE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f6b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+ICON_LEAF = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#e8a33d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 11 13.6 12 12"></path></svg>'
+ICON_CAL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#e8a33d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+ICON_PIN = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#e8a33d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
+ICON_PEOPLE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#e8a33d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
 ICON_UTENSILS_W = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h1a2 2 0 0 0 2-2V2"></path><path d="M6 11v11"></path><path d="M18 2c-2 0-3 2-3 5v2c0 1 1 2 2 2h1v10"></path></svg>'
-ICON_UTENSILS_D = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0f6b58" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h1a2 2 0 0 0 2-2V2"></path><path d="M6 11v11"></path><path d="M18 2c-2 0-3 2-3 5v2c0 1 1 2 2 2h1v10"></path></svg>'
+ICON_UTENSILS_D = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#e8a33d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h1a2 2 0 0 0 2-2V2"></path><path d="M6 11v11"></path><path d="M18 2c-2 0-3 2-3 5v2c0 1 1 2 2 2h1v10"></path></svg>'
 ICON_PLATE = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3.5"></circle></svg>'
 ICON_BOWL = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 6.2 0 0 1-18 0z"></path><path d="M12 11V5"></path><path d="M8 7l4-2.5L16 7"></path></svg>'
 ICON_CUPCAKE = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10h14l-1.4 9a2 2 0 0 1-2 1.7h-7.2a2 2 0 0 1-2-1.7z"></path><path d="M7 10a5 4 0 0 1 10 0"></path><path d="M12 3v3"></path></svg>'
@@ -129,94 +129,92 @@ def weekday_of(iso_str):
 # ----------------------------------------------------------------------
 st.markdown(
     '<style>'
-    "@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Inter:wght@400;600;700;800&display=swap');"
+    "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');"
     '#MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}'
-    # Override Streamlit's own theme variables directly -- this is the
-    # architecturally correct fix (native widgets reference these variables
-    # internally), rather than chasing individual widget selectors.
+    # Override Streamlit's own theme variables directly -- dark navy base,
+    # gold accent, matching the SBC Hoops app.
     ':root, .stApp {'
-    '--background-color:#f7f3ec !important; --secondary-background-color:#ffffff !important; '
-    '--text-color:#1f2937 !important; --primary-color:#0f6b58 !important;'
+    '--background-color:#0d1117 !important; --secondary-background-color:#161b22 !important; '
+    '--text-color:#f3f4f6 !important; --primary-color:#e8a33d !important;'
     '}'
-    'html, body, .stApp { background-color: #f7f3ec !important; }'
-    "html, body, [class*='css'] { font-family: 'Inter', sans-serif; color:#1f2937; }"
+    'html, body, .stApp { background-color: #0d1117 !important; }'
+    "html, body, [class*='css'] { font-family: 'Inter', sans-serif; color:#f3f4f6; }"
     '.block-container {padding-top: 0.5rem; padding-bottom: 1.6rem; max-width: 560px;}'
     '.brand-row {display:flex; align-items:center; gap:0.5rem;}'
-    ".brand-name {font-family:'Inter', sans-serif; font-size:1.4rem; font-weight:800; color:#14261d; margin:0;}"
-    '.brand-sub {font-size:0.75rem; color:#6b6355; margin-top:-0.1rem;}'
-    '.st-key-admin_toggle_btn button {padding: 0.2rem 0.7rem !important; font-size: 0.78rem !important; min-height: 0 !important; margin-top: 0.35rem;}'
-    '.hero {position: relative; border-radius: 16px; overflow: hidden; margin: 0.6rem 0 0.8rem 0; color:#f7f3ec; min-height: 190px; background: linear-gradient(120deg, #5b3a29 0%, #7a5137 45%, #9c7248 100%); background-size: cover; background-position: center;}'
-    '.hero-overlay {position: absolute; inset: 0; z-index: 2; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, rgba(15,10,6,0.78), rgba(15,10,6,0.88)); padding: 1.3rem 1.2rem;}'
-    ".hero-title {font-family:'Merriweather', serif; font-size:1.7rem; font-weight:900; line-height:1.2; margin:0; color:#f7f3ec !important; text-shadow: 0 2px 6px rgba(0,0,0,0.5);}"
-    '.hero-sub {font-size:1.02rem; opacity:0.96; margin: 0.15rem 0 0.6rem 0; color:#f7f3ec !important; text-shadow: 0 1px 4px rgba(0,0,0,0.5);}'
-    '.hero-verse {font-size:0.85rem; font-style:italic; color:#f7f3ec !important; opacity:0.96; border-left:3px solid #e8b94a; padding-left:0.6rem;}'
-    '.hero-deco {position:absolute; right:-10px; bottom:-10px; opacity:0.18; z-index:1;}'
-    '.stat-card {background:#fff; border:1px solid #e7ddce; border-radius:12px; padding:0.65rem 0.75rem; height:100%;}'
-    '.stat-label {font-size:0.7rem; color:#6b6355; font-weight:700; text-transform:uppercase; letter-spacing:0.03em;}'
-    '.stat-value {font-size:0.92rem; color:#1a1f16 !important; font-weight:800; margin-top:0.15rem; line-height:1.35;}'
+    ".brand-name {font-family:'Inter', sans-serif; font-size:1.5rem; font-weight:900; color:#f3f4f6 !important; margin:0; letter-spacing:0.01em;}"
+    '.brand-sub {font-size:0.75rem; color:#9ca3af !important; margin-top:-0.1rem; text-transform:uppercase; letter-spacing:0.05em;}'
+    '.st-key-admin_toggle_btn button {padding: 0.2rem 0.9rem !important; font-size: 0.78rem !important; min-height: 0 !important; margin-top: 0.35rem; font-weight:800 !important; text-transform:uppercase; letter-spacing:0.04em;}'
+    '.hero {position: relative; border-radius: 16px; overflow: hidden; margin: 0.6rem 0 0.8rem 0; color:#f3f4f6; min-height: 190px; background: linear-gradient(120deg, #2a2115 0%, #3a2f1c 45%, #4a3a20 100%); background-size: cover; background-position: center; border:1px solid #2a2f3a;}'
+    '.hero-overlay {position: absolute; inset: 0; z-index: 2; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, rgba(8,10,14,0.75), rgba(8,10,14,0.9)); padding: 1.3rem 1.2rem;}'
+    ".hero-title {font-family:'Inter', sans-serif; font-size:1.7rem; font-weight:900; line-height:1.2; margin:0; color:#f3f4f6 !important; text-shadow: 0 2px 6px rgba(0,0,0,0.6);}"
+    '.hero-sub {font-size:1.02rem; opacity:0.96; margin: 0.15rem 0 0.6rem 0; color:#e8a33d !important; font-weight:700; text-shadow: 0 1px 4px rgba(0,0,0,0.5);}'
+    '.hero-verse {font-size:0.85rem; font-style:italic; color:#e5e7eb !important; opacity:0.96; border-left:3px solid #e8a33d; padding-left:0.6rem;}'
+    '.hero-deco {position:absolute; right:-10px; bottom:-10px; opacity:0.15; z-index:1;}'
+    '.stat-card {background:#161b22; border:1px solid #2a2f3a; border-radius:12px; padding:0.65rem 0.75rem; height:100%;}'
+    '.stat-label {font-size:0.68rem; color:#9ca3af !important; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;}'
+    '.stat-value {font-size:0.92rem; color:#f3f4f6 !important; font-weight:800; margin-top:0.15rem; line-height:1.35;}'
     '.stat-row {display:flex; align-items:flex-start; gap:0.4rem;}'
-    '.section-title {display:flex; align-items:center; gap:0.4rem; font-family:"Merriweather", serif; font-size:1.1rem; font-weight:700; color:#0f6b58 !important; margin:0.8rem 0 0.4rem 0;}'
+    '.section-title {display:flex; align-items:center; gap:0.4rem; font-family:"Inter", sans-serif; font-size:1.05rem; font-weight:800; color:#e8a33d !important; margin:0.8rem 0 0.4rem 0; text-transform:uppercase; letter-spacing:0.04em;}'
     '.dates-strip {display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.3rem;}'
-    '.date-pill {flex: 0 0 auto; min-width: 100px; text-align:center; border-radius:10px; padding:0.5rem 0.6rem; border:1px solid #e7ddce; background:#fff;}'
-    '.date-pill.next {background:#e0f5ef; border-color:#7bd0b8;}'
-    '.date-pill .dow {font-size:0.72rem; color:#8a8171 !important; font-weight:700; text-transform:uppercase;}'
-    '.date-pill.next .dow {color:#0f6b58 !important;}'
-    '.date-pill .dnum {font-size:0.85rem; font-weight:800; color:#1a1f16 !important; margin-top:0.15rem;}'
-    '.allergy-card {background:#fff7e6; border:1px solid #f0d38a; border-radius:12px; padding:0.75rem 1rem; margin:0.6rem 0;}'
-    '.allergy-title {display:flex; align-items:center; gap:0.4rem; font-weight:800; color:#92400e !important; font-size:0.95rem; margin-bottom:0.3rem;}'
-    '.allergy-row {font-size:0.87rem; color:#5c4a1f !important; margin-top:0.2rem;}'
-    '.callout {background:#e0f5ef; border:1px solid #bfe0c6; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}'
-    '.callout b {color:#0f6b58 !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#2a352c !important;}'
-    '.cat-card {background:#fff; border:1.5px solid #c9bda3; border-radius:14px; padding:0.85rem 1rem; margin-bottom:0.7rem; box-shadow: 0 2px 6px rgba(60,45,25,0.08);}'
+    '.date-pill {flex: 0 0 auto; min-width: 100px; text-align:center; border-radius:10px; padding:0.5rem 0.6rem; border:1px solid #2a2f3a; background:#161b22;}'
+    '.date-pill.next {background:rgba(232,163,61,0.12); border-color:#e8a33d;}'
+    '.date-pill .dow {font-size:0.7rem; color:#9ca3af !important; font-weight:700; text-transform:uppercase;}'
+    '.date-pill.next .dow {color:#e8a33d !important;}'
+    '.date-pill .dnum {font-size:0.85rem; font-weight:800; color:#f3f4f6 !important; margin-top:0.15rem;}'
+    '.allergy-card {background:#241c10; border:1px solid #6b4f1a; border-radius:12px; padding:0.75rem 1rem; margin:0.6rem 0;}'
+    '.allergy-title {display:flex; align-items:center; gap:0.4rem; font-weight:800; color:#f2b134 !important; font-size:0.95rem; margin-bottom:0.3rem;}'
+    '.allergy-row {font-size:0.87rem; color:#e5d4a8 !important; margin-top:0.2rem;}'
+    '.callout {background:#12241d; border:1px solid #1f4d3d; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}'
+    '.callout b {color:#4ade80 !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#d1fae5 !important;}'
+    '.cat-card {background:#161b22; border:1.5px solid #2a2f3a; border-radius:14px; padding:0.85rem 1rem; margin-bottom:0.7rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}'
     '.cat-row {display:flex; align-items:center; gap:0.7rem;}'
-    '.cat-avatar {width:44px; height:44px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#5b3a29;}'
-    '.cat-name {font-weight:800; font-size:1.05rem; color:#1a1f16 !important; margin:0;}'
-    '.cat-desc {color:#4d473b !important; font-size:0.85rem; margin:0.1rem 0 0 0;}'
-    '.cat-progress {font-size:0.8rem; color:#3d6b52 !important; font-weight:700; margin-top:0.15rem;}'
-    '.cat-progress.full {color:#6b6355 !important;}'
-    '.who-label {font-size:0.72rem; font-weight:700; color:#8a8171 !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.5rem;}'
-    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:#eef5f0; border:1px solid #cfe3d4; border-radius:8px; padding:0.45rem 0.7rem; margin-top:0.35rem; font-size:0.9rem;}'
+    '.cat-avatar {width:44px; height:44px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#2a2115; border:1px solid #e8a33d;}'
+    '.cat-name {font-weight:800; font-size:1.05rem; color:#f3f4f6 !important; margin:0;}'
+    '.cat-desc {color:#9ca3af !important; font-size:0.85rem; margin:0.1rem 0 0 0;}'
+    '.cat-progress {font-size:0.8rem; color:#4ade80 !important; font-weight:700; margin-top:0.15rem;}'
+    '.cat-progress.full {color:#6b7280 !important;}'
+    '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.5rem;}'
+    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.45rem 0.7rem; margin-top:0.35rem; font-size:0.9rem;}'
     '.signee-left {display:flex; align-items:center;}'
-    '.signee-avatar {width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:white !important; font-size:0.7rem; font-weight:800; margin-right:0.55rem; flex-shrink:0;}'
-    '.signee-name {font-weight:800; color:#14261d !important;}'
-    '.signee-detail {color:#3d453e !important;}'
-    'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem; background-color:#0f6b58; color:#f7f3ec;}'
+    '.signee-avatar {width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#0d1117 !important; font-size:0.7rem; font-weight:900; margin-right:0.55rem; flex-shrink:0;}'
+    '.signee-name {font-weight:800; color:#f3f4f6 !important;}'
+    '.signee-detail {color:#9ca3af !important;}'
+    'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem; background-color:#161b22; color:#f3f4f6; border:1px solid #2a2f3a;}'
     # Attribute-based selector, matches every Streamlit button regardless of
     # which container (dialog, form, expander) it's rendered inside.
     'button[kind="secondary"], button[kind="secondaryFormSubmit"] {'
-    'background-color:#0f6b58 !important; color:#f7f3ec !important; border:none !important;}'
+    'background-color:#161b22 !important; color:#f3f4f6 !important; border:1px solid #2a2f3a !important;}'
     'button[kind="primary"], button[kind="primaryFormSubmit"] {'
-    'background-color:#16382c !important; color:#ffffff !important; border:none !important;}'
-    '.version-tag {text-align:center; color:#c7bfae; font-size:0.68rem; margin-top:1rem;}'
-    # --- Fallback overrides for native widget chrome (in case the theme
-    # variables above aren't picked up everywhere). ---
-    '[data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {background-color:#f7f3ec !important;}'
+    'background-color:#e8a33d !important; color:#1a1206 !important; border:none !important; font-weight:800 !important;}'
+    '.version-tag {text-align:center; color:#4b5563; font-size:0.68rem; margin-top:1rem;}'
+    # --- Fallback overrides for native widget chrome. ---
+    '[data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {background-color:#0d1117 !important;}'
     '.stTextInput input, .stNumberInput input, .stTextArea textarea, .stDateInput input {'
-    'background-color:#ffffff !important; color:#1f2937 !important; border:1px solid #d9cdb8 !important;}'
-    '[data-baseweb="select"] * {background-color:#ffffff !important; color:#1f2937 !important;}'
-    '[data-testid="stForm"] {background-color:#ffffff !important; border:1px solid #e7ddce !important; '
+    'background-color:#161b22 !important; color:#f3f4f6 !important; border:1px solid #2a2f3a !important;}'
+    '[data-baseweb="select"] * {background-color:#161b22 !important; color:#f3f4f6 !important;}'
+    '[data-testid="stForm"] {background-color:#161b22 !important; border:1px solid #2a2f3a !important; '
     'border-radius:12px !important; padding:1rem !important;}'
-    '.stAlert, .stAlert p, .stSuccess, .stError, .stCaption, .stCaption p {color:#1f2937 !important;}'
+    '.stAlert, .stAlert p, .stSuccess, .stError, .stCaption, .stCaption p {color:#f3f4f6 !important;}'
     # --- Dialogs/modals and date-picker calendars render in their own portal
-    # layer -- cover every selector variant Streamlit/BaseWeb might use. ---
+    # layer -- keep them dark too, matching the rest of the app now. ---
     '[data-testid="stDialog"], div[role="dialog"], [data-testid*="Modal"], [data-testid*="modal"] '
-    '{background-color:#ffffff !important;}'
+    '{background-color:#161b22 !important;}'
     '[data-testid="stDialog"] *, div[role="dialog"] *, [data-testid*="Modal"] *, [data-testid*="modal"] * '
-    '{color:#1f2937 !important;}'
+    '{color:#f3f4f6 !important;}'
     '[data-testid="stDialog"] h1, [data-testid="stDialog"] h2, [data-testid="stDialog"] h3, '
-    'div[role="dialog"] h1, div[role="dialog"] h2, div[role="dialog"] h3 {color:#0f6b58 !important;}'
+    'div[role="dialog"] h1, div[role="dialog"] h2, div[role="dialog"] h3 {color:#e8a33d !important;}'
     '[data-testid="stDialog"] input, [data-testid="stDialog"] textarea, '
     'div[role="dialog"] input, div[role="dialog"] textarea, '
     '[data-testid="stDialog"] [data-baseweb="select"] *, div[role="dialog"] [data-baseweb="select"] * '
-    '{background-color:#ffffff !important; color:#1f2937 !important; border-color:#d9cdb8 !important;}'
+    '{background-color:#0d1117 !important; color:#f3f4f6 !important; border-color:#2a2f3a !important;}'
     '[data-testid="stDialog"] div.stButton > button, div[role="dialog"] div.stButton > button '
-    '{background-color:#0f6b58 !important; color:#ffffff !important; border:none !important;}'
+    '{background-color:#e8a33d !important; color:#1a1206 !important; border:none !important; font-weight:700 !important;}'
     '[data-baseweb="popover"], [data-baseweb="calendar"] '
-    '{background-color:#ffffff !important; color:#1f2937 !important;}'
-    '[data-baseweb="calendar"] *, [data-baseweb="popover"] * {color:#1f2937 !important;}'
+    '{background-color:#161b22 !important; color:#f3f4f6 !important;}'
+    '[data-baseweb="calendar"] *, [data-baseweb="popover"] * {color:#f3f4f6 !important;}'
     '[data-baseweb="calendar"] button svg, [data-baseweb="popover"] button svg '
-    '{fill:#0f6b58 !important; stroke:#0f6b58 !important; opacity:1 !important;}'
-    '[data-baseweb="calendar"] button {background-color:#ffffff !important;}'
+    '{fill:#e8a33d !important; stroke:#e8a33d !important; opacity:1 !important;}'
+    '[data-baseweb="calendar"] button {background-color:#161b22 !important;}'
     '</style>',
     unsafe_allow_html=True,
 )
@@ -225,8 +223,8 @@ st.markdown(
 def pencil_css(key):
     st.markdown(
         '<style>.st-key-' + key + ' button {padding:0.02rem 0.5rem !important; font-size:1rem !important; '
-        'min-height:0 !important; line-height:1.6 !important; background:#f4f0e6 !important; color:#5b3a29 !important; '
-        'border:1px solid #d9cdb8 !important;}</style>',
+        'min-height:0 !important; line-height:1.6 !important; background:#1f2530 !important; color:#e8a33d !important; '
+        'border:1px solid #3a4150 !important;}</style>',
         unsafe_allow_html=True,
     )
 
@@ -234,8 +232,8 @@ def pencil_css(key):
 def small_remove_css(key):
     st.markdown(
         '<style>.st-key-' + key + ' button {padding:0.02rem 0.5rem !important; font-size:0.72rem !important; '
-        'min-height:0 !important; background:#fbeaea !important; color:#9b2c2c !important; '
-        'border:1px solid #f0c8c8 !important;}</style>',
+        'min-height:0 !important; background:#2a1418 !important; color:#f87171 !important; '
+        'border:1px solid #5c2a2e !important;}</style>',
         unsafe_allow_html=True,
     )
 
@@ -349,9 +347,9 @@ def remove_allergy(family):
 # ----------------------------------------------------------------------
 # Dialogs
 # ----------------------------------------------------------------------
-@st.dialog("Admin PIN")
+@st.dialog("Host PIN")
 def admin_pin_dialog():
-    pin = st.text_input("Enter admin PIN", type="password", key="pin_dialog_input")
+    pin = st.text_input("Enter host PIN", type="password", key="pin_dialog_input")
     c1, c2 = st.columns(2)
     if c1.button("Unlock", type="primary", use_container_width=True):
         if pin == str(ADMIN_PIN):
@@ -532,7 +530,7 @@ with b1:
         unsafe_allow_html=True,
     )
 with b2:
-    if st.button("Admin", key="admin_toggle_btn"):
+    if st.button("Host", key="admin_toggle_btn"):
         if is_admin:
             st.session_state.admin_open = not st.session_state.admin_open
         else:
@@ -540,15 +538,15 @@ with b2:
 
 if st.session_state.admin_open:
     st.markdown(
-        '<style>.st-key-admin_toggle_btn button {background-color:#0f6b58 !important; '
-        'color:#f7f3ec !important; border:2px solid #ffd60a !important; '
-        'box-shadow: 0 0 0 2px rgba(255,214,10,0.35) !important;}</style>',
+        '<style>.st-key-admin_toggle_btn button {background-color:#161b22 !important; '
+        'color:#e8a33d !important; border:2px solid #e8a33d !important; '
+        'box-shadow: 0 0 0 2px rgba(232,163,61,0.25) !important;}</style>',
         unsafe_allow_html=True,
     )
 else:
     st.markdown(
-        '<style>.st-key-admin_toggle_btn button {background-color:#0f6b58 !important; '
-        'color:#f7f3ec !important; border:2px solid transparent !important; box-shadow:none !important;}</style>',
+        '<style>.st-key-admin_toggle_btn button {background-color:#161b22 !important; '
+        'color:#f3f4f6 !important; border:2px solid #2a2f3a !important; box-shadow:none !important;}</style>',
         unsafe_allow_html=True,
     )
 
@@ -686,7 +684,7 @@ with h2:
 if st.session_state.show_attendees:
     if signed_families:
         for fam, d in signed_families.items():
-            color = FAMILY_COLORS.get(fam, "#1f2937")
+            color = FAMILY_COLORS.get(fam, "#9ca3af")
             row1, row2 = st.columns([4, 1])
             with row1:
                 st.markdown(
@@ -719,9 +717,9 @@ for idx, cat in enumerate(event["categories"]):
         '<style>.st-key-' + card_key + ', .st-key-' + card_key + ' > div, '
         '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"], '
         '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] '
-        '{border:1.5px solid #b9c9bc !important; border-radius:14px !important; '
-        'box-shadow: 0 2px 8px rgba(30,60,45,0.08) !important; '
-        'background:#ffffff !important;}'
+        '{border:1.5px solid #2a2f3a !important; border-radius:14px !important; '
+        'box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; '
+        'background:#161b22 !important;}'
         '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"] '
         '{padding:0.8rem 1rem !important; margin-bottom:0.7rem !important;}</style>',
         unsafe_allow_html=True,
@@ -754,14 +752,14 @@ for idx, cat in enumerate(event["categories"]):
                 sign_up_dialog(name if name else display_name, signed_families, allergies)
             if remaining == 0:
                 st.markdown(
-                    '<style>.st-key-' + btn_key + ' button {background-color:#e4dcc8 !important; '
-                    'color:#4a4438 !important; border:none !important; font-weight:700 !important;}</style>',
+                    '<style>.st-key-' + btn_key + ' button {background-color:#2a2f3a !important; '
+                    'color:#9ca3af !important; border:1px solid #3a4150 !important; font-weight:700 !important;}</style>',
                     unsafe_allow_html=True,
                 )
             else:
                 st.markdown(
-                    '<style>.st-key-' + btn_key + ' button {background-color:#12a894 !important; '
-                    'color:white !important; border:none !important;}</style>',
+                    '<style>.st-key-' + btn_key + ' button {background-color:#e8a33d !important; '
+                    'color:#1a1206 !important; border:none !important; font-weight:800 !important;}</style>',
                     unsafe_allow_html=True,
                 )
 
@@ -769,7 +767,7 @@ for idx, cat in enumerate(event["categories"]):
             st.markdown('<div class="who-label">Who\'s bringing it</div>', unsafe_allow_html=True)
         for fam in matches:
             d = signed_families[fam]
-            fcolor = FAMILY_COLORS.get(fam, "#1f2937")
+            fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
             r1, r2 = st.columns([4, 1])
             with r1:
                 st.markdown(
@@ -798,7 +796,7 @@ st.markdown('<div class="version-tag">v1.' + str(get_version()) + '</div>', unsa
 # ----------------------------------------------------------------------
 if admin_visible:
     st.divider()
-    st.markdown("**Admin**")
+    st.markdown("**Host Tools**")
     st.caption(
         f"Small {PENCIL} buttons appear next to Next Meeting, Location, Upcoming Dates, "
         "the welcome message, and each food category above for quick edits."
@@ -865,7 +863,7 @@ if admin_visible:
         st.rerun()
 
     st.divider()
-    if st.button("Lock admin panel"):
+    if st.button("Lock host panel"):
         st.session_state.admin_ok = False
         st.session_state.admin_open = False
         st.rerun()
