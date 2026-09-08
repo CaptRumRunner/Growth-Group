@@ -176,6 +176,13 @@ st.markdown(
     '.cat-name {font-weight:800; font-size:1.05rem; color:#f3f4f6 !important; margin:0;}'
     '.cat-desc {color:#9ca3af !important; font-size:0.85rem; margin:0.1rem 0 0 0;}'
     '.cat-progress {font-size:0.8rem; color:#4ade80 !important; font-weight:700; margin-top:0.15rem;}'
+    '.cat-row-slim {display:flex; align-items:center; gap:0.5rem; flex-wrap:nowrap; overflow:hidden;}'
+    '.cat-avatar-sm {width:26px; height:26px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#2a2115; border:1px solid #e8a33d;}'
+    '.cat-avatar-sm svg {width:14px !important; height:14px !important;}'
+    '.cat-name-slim {font-weight:800; font-size:0.9rem; color:#f3f4f6 !important; white-space:nowrap; flex-shrink:0;}'
+    '.cat-desc-slim {color:#9ca3af !important; font-size:0.78rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}'
+    '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.78rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0;}'
+    '.cat-qty-slim.full {color:#6b7280 !important;}'
     '.cat-progress.full {color:#6b7280 !important;}'
     '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.5rem;}'
     '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.45rem 0.7rem; margin-top:0.35rem; font-size:0.9rem;}'
@@ -684,11 +691,7 @@ for idx, cat in enumerate(event["categories"]):
         'box-shadow: 0 2px 6px rgba(0,0,0,0.25) !important; '
         'background:#161b22 !important;}'
         '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"] '
-        '{padding:0.55rem 0.75rem !important; margin-bottom:0.5rem !important;}'
-        '.st-key-' + card_key + ' .cat-avatar {width:36px !important; height:36px !important;}'
-        '.st-key-' + card_key + ' .cat-avatar svg {width:18px !important; height:18px !important;}'
-        '.st-key-' + card_key + ' .cat-name {font-size:0.95rem !important;}'
-        '.st-key-' + card_key + ' .cat-desc {font-size:0.78rem !important;}'
+        '{padding:0.5rem 0.7rem !important; margin-bottom:0.5rem !important;}'
         '.st-key-' + card_key + ' [data-testid="column"]:last-child {display:flex !important; '
         'align-items:center !important; justify-content:center !important;}</style>',
         unsafe_allow_html=True,
@@ -699,11 +702,11 @@ for idx, cat in enumerate(event["categories"]):
         with cc1:
             progress_class = "full" if remaining == 0 else ""
             st.markdown(
-                '<div class="cat-row"><div class="cat-avatar">' + cat_icon(name) + '</div>'
-                '<div><p class="cat-name">' + display_name + '</p>'
-                '<p class="cat-desc">' + desc + '</p>'
-                '<p class="cat-progress ' + progress_class + '">' + str(filled) + ' / ' + str(slots) +
-                ' signed up</p></div></div>',
+                '<div class="cat-row-slim"><div class="cat-avatar-sm">' + cat_icon(name) + '</div>'
+                '<span class="cat-name-slim">' + display_name + '</span>'
+                '<span class="cat-desc-slim">' + desc + '</span>'
+                '<span class="cat-qty-slim ' + progress_class + '">' + str(filled) + '/' + str(slots) +
+                ' needed</span></div>',
                 unsafe_allow_html=True,
             )
         with cc2:
