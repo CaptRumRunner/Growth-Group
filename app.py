@@ -197,7 +197,7 @@ st.markdown(
     'background-color:#161b22 !important; color:#f3f4f6 !important; border:1px solid #2a2f3a !important;}'
     'button[kind="primary"], button[kind="primaryFormSubmit"] {'
     'background-color:#e8a33d !important; color:#1a1206 !important; border:none !important; font-weight:800 !important;}'
-    '.version-tag {text-align:center; color:#4b5563; font-size:0.68rem; margin-top:1rem;}'
+    '.version-tag {text-align:left; color:#4b5563; font-size:0.68rem; margin:0.1rem 0 0.3rem 0;}'
     # --- Fallback overrides for native widget chrome. ---
     '[data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {background-color:#0d1117 !important;}'
     '.stTextInput input, .stNumberInput input, .stTextArea textarea, .stDateInput input {'
@@ -519,7 +519,8 @@ with b1:
     st.markdown(
         '<div class="brand-row">' + ICON_LEAF +
         '<div><p class="brand-name">SBC Growth Group</p>'
-        '<p class="brand-sub">Study &middot; Grow &middot; Belong</p></div></div>',
+        '<p class="brand-sub">Study &middot; Grow &middot; Belong</p>'
+        '<div class="version-tag">v1.' + str(get_version()) + '</div></div></div>',
         unsafe_allow_html=True,
     )
 with b2:
@@ -748,8 +749,6 @@ for idx, cat in enumerate(event["categories"]):
                         remove_signup(fam)
                         st.rerun()
                     small_remove_css(rkey)
-
-st.markdown('<div class="version-tag">v1.' + str(get_version()) + '</div>', unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
 # Admin bottom strip: bulk food overview + clear-for-new-night + lock
