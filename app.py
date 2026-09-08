@@ -138,8 +138,8 @@ st.markdown(
     ".brand-name {font-family:'Inter', sans-serif; font-size:1.4rem; font-weight:800; color:#14261d; margin:0;}"
     '.brand-sub {font-size:0.75rem; color:#6b6355; margin-top:-0.1rem;}'
     '.st-key-admin_toggle_btn button {padding: 0.2rem 0.7rem !important; font-size: 0.78rem !important; min-height: 0 !important; margin-top: 0.35rem;}'
-    '.hero {position: relative; border-radius: 16px; overflow: hidden; margin: 0.6rem 0 0.8rem 0; color:#f7f3ec; min-height: 150px; background: linear-gradient(120deg, #5b3a29 0%, #7a5137 45%, #9c7248 100%); background-size: cover; background-position: center;}'
-    '.hero-overlay {position: relative; z-index: 2; background: linear-gradient(180deg, rgba(15,10,6,0.72), rgba(15,10,6,0.85)); padding: 1.3rem 1.2rem;}'
+    '.hero {position: relative; border-radius: 16px; overflow: hidden; margin: 0.6rem 0 0.8rem 0; color:#f7f3ec; min-height: 190px; background: linear-gradient(120deg, #5b3a29 0%, #7a5137 45%, #9c7248 100%); background-size: cover; background-position: center;}'
+    '.hero-overlay {position: absolute; inset: 0; z-index: 2; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, rgba(15,10,6,0.72), rgba(15,10,6,0.85)); padding: 1.3rem 1.2rem;}'
     ".hero-title {font-family:'Merriweather', serif; font-size:1.7rem; font-weight:900; line-height:1.2; margin:0; text-shadow: 0 2px 6px rgba(0,0,0,0.35);}"
     '.hero-sub {font-size:1.02rem; opacity:0.96; margin: 0.15rem 0 0.6rem 0; text-shadow: 0 1px 4px rgba(0,0,0,0.3);}'
     '.hero-verse {font-size:0.85rem; font-style:italic; opacity:0.94; border-left:3px solid #d4af37; padding-left:0.6rem;}'
@@ -524,14 +524,15 @@ with b2:
 
 if st.session_state.admin_open:
     st.markdown(
-        '<style>.st-key-admin_toggle_btn button {background-color:#c9a227 !important; '
-        'color:#2b2109 !important; border:2px solid #8a6d16 !important;}</style>',
+        '<style>.st-key-admin_toggle_btn button {background-color:#1f4d3d !important; '
+        'color:#f7f3ec !important; border:2px solid #ffd60a !important; '
+        'box-shadow: 0 0 0 2px rgba(255,214,10,0.35) !important;}</style>',
         unsafe_allow_html=True,
     )
 else:
     st.markdown(
         '<style>.st-key-admin_toggle_btn button {background-color:#1f4d3d !important; '
-        'color:#f7f3ec !important; border:none !important;}</style>',
+        'color:#f7f3ec !important; border:2px solid transparent !important; box-shadow:none !important;}</style>',
         unsafe_allow_html=True,
     )
 
@@ -773,7 +774,7 @@ if admin_visible:
     st.markdown("**Food Needed This Week** (add, edit, or remove categories directly)")
     name_options = ["Not set yet"] + TYPICAL_CATEGORIES
     for i, cat in enumerate(event["categories"]):
-        rc1, rc2, rc3, rc4 = st.columns([1.4, 1.7, 0.8, 0.8])
+        rc1, rc2, rc3, rc4, rc5 = st.columns([1.6, 1.8, 0.7, 0.9, 0.6])
         with rc1:
             cur_idx = name_options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
             chosen_name = st.selectbox(
@@ -790,15 +791,14 @@ if admin_visible:
                 step=1, key=f"bulk_qty_{i}", label_visibility="collapsed",
             )
         with rc4:
-            row_key = f"bulk_row_btns_{i}"
-            rb1, rb2 = st.columns(2)
-            if rb1.button("Save", key=f"bulk_save_{i}", use_container_width=True):
+            if st.button("Save", key=f"bulk_save_{i}", use_container_width=True):
                 final_name = "" if chosen_name == "Not set yet" else chosen_name
                 cats = [dict(c) for c in event["categories"]]
                 cats[i] = {"name": final_name, "desc": d, "slots": int(q)}
                 save_event({"categories": cats})
                 st.rerun()
-            if rb2.button("Del", key=f"bulk_del_{i}", use_container_width=True):
+        with rc5:
+            if st.button("X", key=f"bulk_del_{i}", use_container_width=True):
                 cats = [dict(c) for j, c in enumerate(event["categories"]) if j != i]
                 save_event({"categories": cats})
                 st.rerun()
