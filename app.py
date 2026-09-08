@@ -184,8 +184,8 @@ st.markdown(
     '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.78rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0;}'
     '.cat-qty-slim.full {color:#6b7280 !important;}'
     '.cat-progress.full {color:#6b7280 !important;}'
-    '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.5rem;}'
-    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.45rem 0.7rem; margin-top:0.35rem; font-size:0.9rem;}'
+    '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.25rem;}'
+    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.35rem 0.65rem; margin-top:0.15rem; font-size:0.87rem;}'
     '.signee-left {display:flex; align-items:center;}'
     '.signee-avatar {width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#0d1117 !important; font-size:0.7rem; font-weight:900; margin-right:0.55rem; flex-shrink:0;}'
     '.signee-name {font-weight:800; color:#f3f4f6 !important;}'
@@ -693,6 +693,8 @@ for idx, cat in enumerate(event["categories"]):
         'background:#161b22 !important;}'
         '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"] '
         '{padding:0.5rem 0.7rem !important; margin-bottom:0.5rem !important;}'
+        '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] {gap: 0.15rem !important;}'
+        '.st-key-' + card_key + ' [data-testid="element-container"] {margin-bottom: 0 !important;}'
         '.st-key-' + card_key + ' [data-testid="column"]:last-child {display:flex !important; '
         'align-items:center !important; justify-content:center !important;}</style>',
         unsafe_allow_html=True,
@@ -733,22 +735,24 @@ for idx, cat in enumerate(event["categories"]):
         for fam in matches:
             d = signed_families[fam]
             fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
-            r1, r2 = st.columns([4, 1])
-            with r1:
-                st.markdown(
-                    '<div class="signee-row"><span class="signee-left">'
-                    '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
-                    '<span class="signee-name">The ' + fam + ' Family</span></span>'
-                    '<span class="signee-detail">' + str(d['count']) + ' people</span></div>',
-                    unsafe_allow_html=True,
-                )
-            with r2:
-                if admin_visible:
+            row_html = (
+                '<div class="signee-row"><span class="signee-left">'
+                '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
+                '<span class="signee-name">The ' + fam + ' Family</span></span>'
+                '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
+            )
+            if admin_visible:
+                r1, r2 = st.columns([4, 1])
+                with r1:
+                    st.markdown(row_html, unsafe_allow_html=True)
+                with r2:
                     rkey = f"rm_cat_signee_{idx}_{fam}"
                     if st.button("Remove", key=rkey):
                         remove_signup(fam)
                         st.rerun()
                     small_remove_css(rkey)
+            else:
+                st.markdown(row_html, unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
 # Admin bottom strip: bulk food overview + clear-for-new-night + lock
