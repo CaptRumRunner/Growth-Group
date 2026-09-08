@@ -185,6 +185,16 @@ st.markdown(
     '.stMarkdown p, .stMarkdown strong, .stMarkdown li, .stCaption, label, '
     '.stCheckbox label p, .stRadio label p {color:#1f2937 !important;}'
     'div.stButton > button {background-color:#1f4d3d; color:#f7f3ec;}'
+    # --- Dialog/modal popups render in their own layer -- force them light too. ---
+    '[data-testid="stDialog"] {background-color:#ffffff !important;}'
+    '[data-testid="stDialog"] * {color:#1f2937 !important;}'
+    '[data-testid="stDialog"] h1, [data-testid="stDialog"] h2, [data-testid="stDialog"] h3 '
+    '{color:#1f4d3d !important;}'
+    '[data-testid="stDialog"] input, [data-testid="stDialog"] textarea, '
+    '[data-testid="stDialog"] [data-baseweb="select"] * '
+    '{background-color:#ffffff !important; color:#1f2937 !important; border-color:#d9cdb8 !important;}'
+    '[data-testid="stDialog"] div.stButton > button '
+    '{background-color:#1f4d3d !important; color:#ffffff !important; border:none !important;}'
     '</style>',
     unsafe_allow_html=True,
 )
@@ -733,7 +743,7 @@ if admin_visible:
     if st.button("+ Add Category", key="add_cat_btn", use_container_width=True):
         add_category_dialog(event)
 
-st.markdown('<div class="version-tag">v' + str(get_version()) + '</div>', unsafe_allow_html=True)
+st.markdown('<div class="version-tag">v1.' + str(get_version()) + '</div>', unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
 # Admin bottom strip: bulk food overview + clear-for-new-night + lock
@@ -748,11 +758,16 @@ if admin_visible:
 
     with st.form("bulk_food_form"):
         st.markdown("**Food Needed This Week** (overview -- adjust and save all at once)")
+        name_options = ["(no type set)"] + TYPICAL_CATEGORIES
         edited_rows = []
         for i, cat in enumerate(event["categories"]):
             rc1, rc2, rc3 = st.columns([1.4, 2, 1])
             with rc1:
-                st.markdown(f"**{cat['name'] or '(no type)'}**")
+                cur_idx = name_options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
+                chosen_name = st.selectbox(
+                    "Category", options=name_options, index=cur_idx,
+                    key=f"bulk_name_{i}", label_visibility="collapsed",
+                )
             with rc2:
                 d = st.text_input(
                     "Description", value=cat.get("desc", ""), key=f"bulk_desc_{i}", label_visibility="collapsed"
@@ -762,7 +777,8 @@ if admin_visible:
                     "Qty", min_value=0, max_value=50, value=int(cat.get("slots", 1)),
                     step=1, key=f"bulk_qty_{i}", label_visibility="collapsed",
                 )
-            edited_rows.append({"name": cat["name"], "desc": d, "slots": int(q)})
+            final_name = "" if chosen_name == "(no type set)" else chosen_name
+            edited_rows.append({"name": final_name, "desc": d, "slots": int(q)})
         if st.form_submit_button("Save all quantities"):
             save_event({"categories": edited_rows})
             st.rerun()
