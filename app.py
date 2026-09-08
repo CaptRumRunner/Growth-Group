@@ -726,14 +726,6 @@ for idx, cat in enumerate(event["categories"]):
     )
 
     with st.container(border=True, key=card_key):
-        if admin_visible:
-            top1, top2 = st.columns([5, 1])
-            with top2:
-                ekey = f"edit_cat_{idx}"
-                if st.button(PENCIL, key=ekey):
-                    edit_category_dialog(event, idx)
-                pencil_css(ekey)
-
         cc1, cc2 = st.columns([3, 1.1])
         with cc1:
             progress_class = "full" if remaining == 0 else ""
@@ -746,6 +738,11 @@ for idx, cat in enumerate(event["categories"]):
                 unsafe_allow_html=True,
             )
         with cc2:
+            if admin_visible:
+                ekey = f"edit_cat_{idx}"
+                if st.button(PENCIL, key=ekey, use_container_width=True):
+                    edit_category_dialog(event, idx)
+                pencil_css(ekey)
             btn_label = "Full" if remaining == 0 else "Sign Up"
             btn_key = f"signup_{idx}"
             if st.button(btn_label, key=btn_key, use_container_width=True):
