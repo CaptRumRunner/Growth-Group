@@ -58,6 +58,10 @@ DEFAULT_EVENT = {
     "time": "5:00 PM",
     "upcoming_dates": [],  # list of ISO "YYYY-MM-DD" strings
     "hero_image_url": DEFAULT_HERO_IMAGE,
+    "hero_title": "Bible Study & Fellowship",
+    "hero_sub": "Food Brings Us Together",
+    "hero_verse_text": "They broke bread in their homes and ate together with glad and sincere hearts.",
+    "hero_verse_ref": "Acts 2:46",
     "callout_text": (
         "Sign your family up below to bring a dish, drink, or item. Signing up also "
         "lets us know you're planning to be there -- thank you for helping make this "
@@ -396,13 +400,33 @@ def sign_up_dialog(category_name, signed_families, allergies):
 @st.dialog("Edit Next Meeting")
 def edit_meeting_dialog(event):
     new_time = st.text_input("Time (e.g. '5:00 PM' or '5:00 - 7:00 PM')", value=event["time"])
+    c1, c2 = st.columns(2)
+    if c1.button("Save", type="primary", use_container_width=True):
+        save_event({"time": new_time})
+        st.rerun()
+    if c2.button("Cancel", use_container_width=True):
+        st.rerun()
+
+
+@st.dialog("Edit Banner")
+def edit_hero_dialog(event):
+    new_title = st.text_input("Title", value=event["hero_title"])
+    new_sub = st.text_input("Subtitle", value=event["hero_sub"])
+    new_verse_text = st.text_area("Verse text", value=event["hero_verse_text"], height=80)
+    new_verse_ref = st.text_input("Verse reference (e.g. 'Acts 2:46')", value=event["hero_verse_ref"])
     new_image = st.text_input(
-        "Hero background image URL (optional -- a photo you have the rights to use)",
+        "Background image URL (optional -- a photo you have the rights to use)",
         value=event.get("hero_image_url", ""),
     )
     c1, c2 = st.columns(2)
     if c1.button("Save", type="primary", use_container_width=True):
-        save_event({"time": new_time, "hero_image_url": new_image.strip()})
+        save_event({
+            "hero_title": new_title,
+            "hero_sub": new_sub,
+            "hero_verse_text": new_verse_text,
+            "hero_verse_ref": new_verse_ref,
+            "hero_image_url": new_image.strip(),
+        })
         st.rerun()
     if c2.button("Cancel", use_container_width=True):
         st.rerun()
@@ -450,44 +474,6 @@ def render_dates_editor(event):
         st.rerun()
 
 
-@st.dialog("Edit Category")
-def edit_category_dialog(event, idx):
-    cat = event["categories"][idx]
-    options = ["Not set yet"] + TYPICAL_CATEGORIES
-    current_index = options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
-    name = st.selectbox("Category type", options=options, index=current_index)
-    desc = st.text_input("Description", value=cat.get("desc", ""))
-    qty = st.number_input("Qty needed", min_value=0, max_value=50, value=int(cat.get("slots", 1)), step=1)
-    c1, c2, c3 = st.columns(3)
-    if c1.button("Save", type="primary", use_container_width=True):
-        cats = [dict(c) for c in event["categories"]]
-        cats[idx] = {"name": "" if name == "Not set yet" else name, "desc": desc, "slots": int(qty)}
-        save_event({"categories": cats})
-        st.rerun()
-    if c2.button("Remove", use_container_width=True):
-        cats = [dict(c) for i, c in enumerate(event["categories"]) if i != idx]
-        save_event({"categories": cats})
-        st.rerun()
-    if c3.button("Cancel", use_container_width=True):
-        st.rerun()
-
-
-@st.dialog("Add Category")
-def add_category_dialog(event):
-    options = ["Not set yet"] + TYPICAL_CATEGORIES
-    name = st.selectbox("Category type", options=options)
-    desc = st.text_input("Description", value="")
-    qty = st.number_input("Qty needed", min_value=0, max_value=50, value=2, step=1)
-    c1, c2 = st.columns(2)
-    if c1.button("Add", type="primary", use_container_width=True):
-        cats = [dict(c) for c in event["categories"]]
-        cats.append({"name": "" if name == "Not set yet" else name, "desc": desc, "slots": int(qty)})
-        save_event({"categories": cats})
-        st.rerun()
-    if c2.button("Cancel", use_container_width=True):
-        st.rerun()
-
-
 @st.dialog("Edit Welcome Message")
 def edit_callout_dialog(event):
     new_text = st.text_area("Message", value=event["callout_text"], height=120)
@@ -511,8 +497,8 @@ if "admin_open" not in st.session_state:
     st.session_state.admin_open = False
 if "admin_ok" not in st.session_state:
     st.session_state.admin_ok = False
-if "show_attendees" not in st.session_state:
-    st.session_state.show_attendees = False
+if "show_dates_editor" not in st.session_state:
+    st.session_state.show_dates_editor = False
 
 is_admin = st.session_state.admin_ok
 admin_visible = is_admin and st.session_state.admin_open
@@ -561,13 +547,19 @@ deco = "" if event.get("hero_image_url") else DECO_BOOK_CUP
 st.markdown(
     '<div class="hero"' + hero_style + '>' + deco +
     '<div class="hero-overlay">'
-    '<p class="hero-title">Bible Study &amp; Fellowship</p>'
-    '<p class="hero-sub">Food Brings Us Together</p>'
-    '<div class="hero-verse">&quot;They broke bread in their homes and ate together '
-    'with glad and sincere hearts.&quot;<br>-- Acts 2:46</div>'
+    '<p class="hero-title">' + event["hero_title"] + '</p>'
+    '<p class="hero-sub">' + event["hero_sub"] + '</p>'
+    '<div class="hero-verse">&quot;' + event["hero_verse_text"] + '&quot;<br>-- ' + event["hero_verse_ref"] + '</div>'
     '</div></div>',
     unsafe_allow_html=True,
 )
+
+if admin_visible:
+    hcol1, hcol2 = st.columns([5, 1])
+    with hcol2:
+        if st.button(PENCIL, key="edit_hero_btn", use_container_width=True):
+            edit_hero_dialog(event)
+        pencil_css("edit_hero_btn")
 
 # ----------------------------------------------------------------------
 # Stat cards: Next Meeting / Location / Families Attending
@@ -674,36 +666,7 @@ with ch2:
 # ----------------------------------------------------------------------
 # Food Sign Up section
 # ----------------------------------------------------------------------
-h1, h2 = st.columns([3, 1.3])
-with h1:
-    st.markdown('<div class="section-title">' + ICON_UTENSILS_D + ' Food Sign Up</div>', unsafe_allow_html=True)
-with h2:
-    if st.button("View Attendees", key="view_attendees_btn", use_container_width=True):
-        st.session_state.show_attendees = not st.session_state.show_attendees
-
-if st.session_state.show_attendees:
-    if signed_families:
-        for fam, d in signed_families.items():
-            color = FAMILY_COLORS.get(fam, "#9ca3af")
-            row1, row2 = st.columns([4, 1])
-            with row1:
-                st.markdown(
-                    '<div class="signee-row"><span class="signee-left">'
-                    '<span class="signee-avatar" style="background:' + color + ';">' + initials(fam) + '</span>'
-                    '<span class="signee-name">The ' + fam + ' Family</span></span>'
-                    '<span class="signee-detail">' + str(d['count']) + ' people -- ' +
-                    (d['category'] or 'no category') + '</span></div>',
-                    unsafe_allow_html=True,
-                )
-            with row2:
-                if admin_visible:
-                    rkey = f"rm_attendee_{fam}"
-                    if st.button("Remove", key=rkey):
-                        remove_signup(fam)
-                        st.rerun()
-                    small_remove_css(rkey)
-    else:
-        st.caption("No one has signed up yet.")
+st.markdown('<div class="section-title">' + ICON_UTENSILS_D + ' Food Sign Up</div>', unsafe_allow_html=True)
 
 for idx, cat in enumerate(event["categories"]):
     name, desc, slots = cat["name"], cat.get("desc", ""), cat.get("slots", 1)
@@ -717,11 +680,17 @@ for idx, cat in enumerate(event["categories"]):
         '<style>.st-key-' + card_key + ', .st-key-' + card_key + ' > div, '
         '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"], '
         '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] '
-        '{border:1.5px solid #2a2f3a !important; border-radius:14px !important; '
-        'box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; '
+        '{border:1.5px solid #2a2f3a !important; border-radius:12px !important; '
+        'box-shadow: 0 2px 6px rgba(0,0,0,0.25) !important; '
         'background:#161b22 !important;}'
         '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"] '
-        '{padding:0.8rem 1rem !important; margin-bottom:0.7rem !important;}</style>',
+        '{padding:0.55rem 0.75rem !important; margin-bottom:0.5rem !important;}'
+        '.st-key-' + card_key + ' .cat-avatar {width:36px !important; height:36px !important;}'
+        '.st-key-' + card_key + ' .cat-avatar svg {width:18px !important; height:18px !important;}'
+        '.st-key-' + card_key + ' .cat-name {font-size:0.95rem !important;}'
+        '.st-key-' + card_key + ' .cat-desc {font-size:0.78rem !important;}'
+        '.st-key-' + card_key + ' [data-testid="column"]:last-child {display:flex !important; '
+        'align-items:center !important; justify-content:center !important;}</style>',
         unsafe_allow_html=True,
     )
 
@@ -738,11 +707,6 @@ for idx, cat in enumerate(event["categories"]):
                 unsafe_allow_html=True,
             )
         with cc2:
-            if admin_visible:
-                ekey = f"edit_cat_{idx}"
-                if st.button(PENCIL, key=ekey, use_container_width=True):
-                    edit_category_dialog(event, idx)
-                pencil_css(ekey)
             btn_label = "Full" if remaining == 0 else "Sign Up"
             btn_key = f"signup_{idx}"
             if st.button(btn_label, key=btn_key, use_container_width=True):
@@ -782,10 +746,6 @@ for idx, cat in enumerate(event["categories"]):
                         st.rerun()
                     small_remove_css(rkey)
 
-if admin_visible:
-    if st.button("+ Add Category", key="add_cat_btn", use_container_width=True):
-        add_category_dialog(event)
-
 st.markdown('<div class="version-tag">v1.' + str(get_version()) + '</div>', unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
@@ -799,33 +759,40 @@ if admin_visible:
         "the welcome message, and each food category above for quick edits."
     )
 
-    st.markdown("**Food Needed This Week** (add, edit, or remove categories directly)")
+    st.markdown("**Food Needed This Week** (changes save automatically)")
     name_options = ["Not set yet"] + TYPICAL_CATEGORIES
+    total_cats = len(event["categories"])
+
+    def _save_bulk_row(total=total_cats):
+        cats = []
+        for j in range(total):
+            raw_name = st.session_state.get(f"bulk_name_{j}", "Not set yet")
+            cats.append({
+                "name": "" if raw_name == "Not set yet" else raw_name,
+                "desc": st.session_state.get(f"bulk_desc_{j}", ""),
+                "slots": int(st.session_state.get(f"bulk_qty_{j}", 1) or 0),
+            })
+        save_event({"categories": cats})
+
     for i, cat in enumerate(event["categories"]):
-        rc1, rc2, rc3, rc4, rc5 = st.columns([1.6, 1.8, 0.7, 0.9, 0.6])
+        rc1, rc2, rc3, rc4 = st.columns([1.6, 2.1, 0.8, 0.6])
         with rc1:
             cur_idx = name_options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
-            chosen_name = st.selectbox(
+            st.selectbox(
                 "Category", options=name_options, index=cur_idx,
-                key=f"bulk_name_{i}", label_visibility="collapsed",
+                key=f"bulk_name_{i}", label_visibility="collapsed", on_change=_save_bulk_row,
             )
         with rc2:
-            d = st.text_input(
-                "Description", value=cat.get("desc", ""), key=f"bulk_desc_{i}", label_visibility="collapsed"
+            st.text_input(
+                "Description", value=cat.get("desc", ""), key=f"bulk_desc_{i}",
+                label_visibility="collapsed", on_change=_save_bulk_row,
             )
         with rc3:
-            q = st.number_input(
+            st.number_input(
                 "Qty", min_value=0, max_value=50, value=int(cat.get("slots", 1)),
-                step=1, key=f"bulk_qty_{i}", label_visibility="collapsed",
+                step=1, key=f"bulk_qty_{i}", label_visibility="collapsed", on_change=_save_bulk_row,
             )
         with rc4:
-            if st.button("Save", key=f"bulk_save_{i}", use_container_width=True):
-                final_name = "" if chosen_name == "Not set yet" else chosen_name
-                cats = [dict(c) for c in event["categories"]]
-                cats[i] = {"name": final_name, "desc": d, "slots": int(q)}
-                save_event({"categories": cats})
-                st.rerun()
-        with rc5:
             if st.button("X", key=f"bulk_del_{i}", use_container_width=True):
                 cats = [dict(c) for j, c in enumerate(event["categories"]) if j != i]
                 save_event({"categories": cats})
