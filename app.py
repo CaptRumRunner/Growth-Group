@@ -36,11 +36,11 @@ FAMILIES = {
 }
 
 FAMILY_COLORS = {
-    "Griffith": "#c9a227",
-    "Crissman": "#c1573a",
-    "Lee": "#4f8a68",
-    "Russell": "#3b6ea5",
-    "Siefert": "#8a5fa5",
+    "Griffith": "#d97706",
+    "Crissman": "#e0574a",
+    "Lee": "#16a37a",
+    "Russell": "#4f6ef7",
+    "Siefert": "#a855c7",
 }
 
 TYPICAL_CATEGORIES = [
@@ -76,12 +76,12 @@ DEFAULT_EVENT = {
 # ----------------------------------------------------------------------
 # Icons -- single-line SVG strings only (multi-line breaks HTML rendering)
 # ----------------------------------------------------------------------
-ICON_LEAF = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 11 13.6 12 12"></path></svg>'
-ICON_CAL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
-ICON_PIN = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
-ICON_PEOPLE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1f4d3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
+ICON_LEAF = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0f6b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 11 13.6 12 12"></path></svg>'
+ICON_CAL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f6b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+ICON_PIN = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f6b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
+ICON_PEOPLE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f6b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
 ICON_UTENSILS_W = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h1a2 2 0 0 0 2-2V2"></path><path d="M6 11v11"></path><path d="M18 2c-2 0-3 2-3 5v2c0 1 1 2 2 2h1v10"></path></svg>'
-ICON_UTENSILS_D = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#1f4d3d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h1a2 2 0 0 0 2-2V2"></path><path d="M6 11v11"></path><path d="M18 2c-2 0-3 2-3 5v2c0 1 1 2 2 2h1v10"></path></svg>'
+ICON_UTENSILS_D = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0f6b58" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h1a2 2 0 0 0 2-2V2"></path><path d="M6 11v11"></path><path d="M18 2c-2 0-3 2-3 5v2c0 1 1 2 2 2h1v10"></path></svg>'
 ICON_PLATE = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3.5"></circle></svg>'
 ICON_BOWL = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 6.2 0 0 1-18 0z"></path><path d="M12 11V5"></path><path d="M8 7l4-2.5L16 7"></path></svg>'
 ICON_CUPCAKE = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10h14l-1.4 9a2 2 0 0 1-2 1.7h-7.2a2 2 0 0 1-2-1.7z"></path><path d="M7 10a5 4 0 0 1 10 0"></path><path d="M12 3v3"></path></svg>'
@@ -136,7 +136,7 @@ st.markdown(
     # internally), rather than chasing individual widget selectors.
     ':root, .stApp {'
     '--background-color:#f7f3ec !important; --secondary-background-color:#ffffff !important; '
-    '--text-color:#1f2937 !important; --primary-color:#1f4d3d !important;'
+    '--text-color:#1f2937 !important; --primary-color:#0f6b58 !important;'
     '}'
     'html, body, .stApp { background-color: #f7f3ec !important; }'
     "html, body, [class*='css'] { font-family: 'Inter', sans-serif; color:#1f2937; }"
@@ -149,24 +149,24 @@ st.markdown(
     '.hero-overlay {position: absolute; inset: 0; z-index: 2; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, rgba(15,10,6,0.78), rgba(15,10,6,0.88)); padding: 1.3rem 1.2rem;}'
     ".hero-title {font-family:'Merriweather', serif; font-size:1.7rem; font-weight:900; line-height:1.2; margin:0; color:#f7f3ec !important; text-shadow: 0 2px 6px rgba(0,0,0,0.5);}"
     '.hero-sub {font-size:1.02rem; opacity:0.96; margin: 0.15rem 0 0.6rem 0; color:#f7f3ec !important; text-shadow: 0 1px 4px rgba(0,0,0,0.5);}'
-    '.hero-verse {font-size:0.85rem; font-style:italic; color:#f7f3ec !important; opacity:0.96; border-left:3px solid #d4af37; padding-left:0.6rem;}'
+    '.hero-verse {font-size:0.85rem; font-style:italic; color:#f7f3ec !important; opacity:0.96; border-left:3px solid #e8b94a; padding-left:0.6rem;}'
     '.hero-deco {position:absolute; right:-10px; bottom:-10px; opacity:0.18; z-index:1;}'
     '.stat-card {background:#fff; border:1px solid #e7ddce; border-radius:12px; padding:0.65rem 0.75rem; height:100%;}'
     '.stat-label {font-size:0.7rem; color:#6b6355; font-weight:700; text-transform:uppercase; letter-spacing:0.03em;}'
     '.stat-value {font-size:0.92rem; color:#1a1f16 !important; font-weight:800; margin-top:0.15rem; line-height:1.35;}'
     '.stat-row {display:flex; align-items:flex-start; gap:0.4rem;}'
-    '.section-title {display:flex; align-items:center; gap:0.4rem; font-family:"Merriweather", serif; font-size:1.1rem; font-weight:700; color:#1f4d3d !important; margin:0.8rem 0 0.4rem 0;}'
+    '.section-title {display:flex; align-items:center; gap:0.4rem; font-family:"Merriweather", serif; font-size:1.1rem; font-weight:700; color:#0f6b58 !important; margin:0.8rem 0 0.4rem 0;}'
     '.dates-strip {display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.3rem;}'
     '.date-pill {flex: 0 0 auto; min-width: 100px; text-align:center; border-radius:10px; padding:0.5rem 0.6rem; border:1px solid #e7ddce; background:#fff;}'
-    '.date-pill.next {background:#e8f3ea; border-color:#8fc79c;}'
+    '.date-pill.next {background:#e0f5ef; border-color:#7bd0b8;}'
     '.date-pill .dow {font-size:0.72rem; color:#8a8171 !important; font-weight:700; text-transform:uppercase;}'
-    '.date-pill.next .dow {color:#1f4d3d !important;}'
+    '.date-pill.next .dow {color:#0f6b58 !important;}'
     '.date-pill .dnum {font-size:0.85rem; font-weight:800; color:#1a1f16 !important; margin-top:0.15rem;}'
     '.allergy-card {background:#fff7e6; border:1px solid #f0d38a; border-radius:12px; padding:0.75rem 1rem; margin:0.6rem 0;}'
     '.allergy-title {display:flex; align-items:center; gap:0.4rem; font-weight:800; color:#92400e !important; font-size:0.95rem; margin-bottom:0.3rem;}'
     '.allergy-row {font-size:0.87rem; color:#5c4a1f !important; margin-top:0.2rem;}'
-    '.callout {background:#e8f3ea; border:1px solid #bfe0c6; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}'
-    '.callout b {color:#1f4d3d !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#2a352c !important;}'
+    '.callout {background:#e0f5ef; border:1px solid #bfe0c6; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}'
+    '.callout b {color:#0f6b58 !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#2a352c !important;}'
     '.cat-card {background:#fff; border:1.5px solid #c9bda3; border-radius:14px; padding:0.85rem 1rem; margin-bottom:0.7rem; box-shadow: 0 2px 6px rgba(60,45,25,0.08);}'
     '.cat-row {display:flex; align-items:center; gap:0.7rem;}'
     '.cat-avatar {width:44px; height:44px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#5b3a29;}'
@@ -180,7 +180,13 @@ st.markdown(
     '.signee-avatar {width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:white !important; font-size:0.7rem; font-weight:800; margin-right:0.55rem; flex-shrink:0;}'
     '.signee-name {font-weight:800; color:#14261d !important;}'
     '.signee-detail {color:#3d453e !important;}'
-    'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem; background-color:#1f4d3d; color:#f7f3ec;}'
+    'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem; background-color:#0f6b58; color:#f7f3ec;}'
+    # Attribute-based selector, matches every Streamlit button regardless of
+    # which container (dialog, form, expander) it's rendered inside.
+    'button[kind="secondary"], button[kind="secondaryFormSubmit"] {'
+    'background-color:#0f6b58 !important; color:#f7f3ec !important; border:none !important;}'
+    'button[kind="primary"], button[kind="primaryFormSubmit"] {'
+    'background-color:#16382c !important; color:#ffffff !important; border:none !important;}'
     '.version-tag {text-align:center; color:#c7bfae; font-size:0.68rem; margin-top:1rem;}'
     # --- Fallback overrides for native widget chrome (in case the theme
     # variables above aren't picked up everywhere). ---
@@ -198,18 +204,18 @@ st.markdown(
     '[data-testid="stDialog"] *, div[role="dialog"] *, [data-testid*="Modal"] *, [data-testid*="modal"] * '
     '{color:#1f2937 !important;}'
     '[data-testid="stDialog"] h1, [data-testid="stDialog"] h2, [data-testid="stDialog"] h3, '
-    'div[role="dialog"] h1, div[role="dialog"] h2, div[role="dialog"] h3 {color:#1f4d3d !important;}'
+    'div[role="dialog"] h1, div[role="dialog"] h2, div[role="dialog"] h3 {color:#0f6b58 !important;}'
     '[data-testid="stDialog"] input, [data-testid="stDialog"] textarea, '
     'div[role="dialog"] input, div[role="dialog"] textarea, '
     '[data-testid="stDialog"] [data-baseweb="select"] *, div[role="dialog"] [data-baseweb="select"] * '
     '{background-color:#ffffff !important; color:#1f2937 !important; border-color:#d9cdb8 !important;}'
     '[data-testid="stDialog"] div.stButton > button, div[role="dialog"] div.stButton > button '
-    '{background-color:#1f4d3d !important; color:#ffffff !important; border:none !important;}'
+    '{background-color:#0f6b58 !important; color:#ffffff !important; border:none !important;}'
     '[data-baseweb="popover"], [data-baseweb="calendar"] '
     '{background-color:#ffffff !important; color:#1f2937 !important;}'
     '[data-baseweb="calendar"] *, [data-baseweb="popover"] * {color:#1f2937 !important;}'
     '[data-baseweb="calendar"] button svg, [data-baseweb="popover"] button svg '
-    '{fill:#1f4d3d !important; stroke:#1f4d3d !important; opacity:1 !important;}'
+    '{fill:#0f6b58 !important; stroke:#0f6b58 !important; opacity:1 !important;}'
     '[data-baseweb="calendar"] button {background-color:#ffffff !important;}'
     '</style>',
     unsafe_allow_html=True,
@@ -288,6 +294,7 @@ def load_event():
             valid_dates.append(d)
         except (ValueError, TypeError):
             pass
+    valid_dates = [d for d in valid_dates if d >= date.today().isoformat()]
     data["upcoming_dates"] = sorted(valid_dates)
 
     # Fall back to the default background photo if none was set (or was
@@ -414,23 +421,30 @@ def edit_location_dialog(event):
         st.rerun()
 
 
-@st.dialog("Edit Upcoming Dates")
-def edit_dates_dialog(event):
+def render_dates_editor(event):
+    """Rendered inline (not as a modal) -- the date-picker's month header
+    was getting clipped inside the dialog's fixed-height popup."""
     dates = sorted(event["upcoming_dates"])
     st.markdown("**Current dates**")
     if dates:
         for d in dates:
             r1, r2 = st.columns([3, 1])
             r1.write(fmt_date(d))
-            if r2.button("Remove", key=f"rm_date_{d}"):
+            rkey = f"rm_date_{d}"
+            if r2.button("Remove", key=rkey):
                 remaining = [x for x in dates if x != d]
                 save_event({"upcoming_dates": remaining})
                 st.rerun()
+            small_remove_css(rkey)
     else:
         st.caption("No dates yet.")
     st.divider()
-    new_d = st.date_input("Add a date", value=date.today() + timedelta(days=7))
-    if st.button("Add date", type="primary"):
+    new_d = st.date_input(
+        "Add a date", value=date.today() + timedelta(days=7),
+        min_value=date.today(), max_value=date.today() + timedelta(days=730),
+        key="new_date_input",
+    )
+    if st.button("Add date", type="primary", key="add_date_btn"):
         iso = new_d.isoformat()
         if iso not in dates:
             dates.append(iso)
@@ -526,14 +540,14 @@ with b2:
 
 if st.session_state.admin_open:
     st.markdown(
-        '<style>.st-key-admin_toggle_btn button {background-color:#1f4d3d !important; '
+        '<style>.st-key-admin_toggle_btn button {background-color:#0f6b58 !important; '
         'color:#f7f3ec !important; border:2px solid #ffd60a !important; '
         'box-shadow: 0 0 0 2px rgba(255,214,10,0.35) !important;}</style>',
         unsafe_allow_html=True,
     )
 else:
     st.markdown(
-        '<style>.st-key-admin_toggle_btn button {background-color:#1f4d3d !important; '
+        '<style>.st-key-admin_toggle_btn button {background-color:#0f6b58 !important; '
         'color:#f7f3ec !important; border:2px solid transparent !important; box-shadow:none !important;}</style>',
         unsafe_allow_html=True,
     )
@@ -606,8 +620,12 @@ with dh1:
 with dh2:
     if admin_visible:
         if st.button(PENCIL, key="edit_dates_btn"):
-            edit_dates_dialog(event)
+            st.session_state.show_dates_editor = not st.session_state.get("show_dates_editor", False)
         pencil_css("edit_dates_btn")
+
+if admin_visible and st.session_state.get("show_dates_editor"):
+    with st.container(border=True):
+        render_dates_editor(event)
 
 if sorted_dates:
     pills = ""
@@ -695,68 +713,79 @@ for idx, cat in enumerate(event["categories"]):
     matches = [f for f, d in signed_families.items() if d["category"] == name]
     filled = len(matches)
     remaining = max(slots - filled, 0)
+    card_key = f"catcard_{idx}"
 
-    st.markdown('<div class="cat-card">', unsafe_allow_html=True)
+    st.markdown(
+        '<style>.st-key-' + card_key + ', .st-key-' + card_key + ' > div, '
+        '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"], '
+        '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] '
+        '{border:1.5px solid #b9c9bc !important; border-radius:14px !important; '
+        'box-shadow: 0 2px 8px rgba(30,60,45,0.08) !important; '
+        'background:#ffffff !important;}'
+        '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"] '
+        '{padding:0.8rem 1rem !important; margin-bottom:0.7rem !important;}</style>',
+        unsafe_allow_html=True,
+    )
 
-    if admin_visible:
-        top1, top2 = st.columns([5, 1])
-        with top2:
-            ekey = f"edit_cat_{idx}"
-            if st.button(PENCIL, key=ekey):
-                edit_category_dialog(event, idx)
-            pencil_css(ekey)
+    with st.container(border=True, key=card_key):
+        if admin_visible:
+            top1, top2 = st.columns([5, 1])
+            with top2:
+                ekey = f"edit_cat_{idx}"
+                if st.button(PENCIL, key=ekey):
+                    edit_category_dialog(event, idx)
+                pencil_css(ekey)
 
-    cc1, cc2 = st.columns([3, 1.1])
-    with cc1:
-        progress_class = "full" if remaining == 0 else ""
-        st.markdown(
-            '<div class="cat-row"><div class="cat-avatar">' + cat_icon(name) + '</div>'
-            '<div><p class="cat-name">' + display_name + '</p>'
-            '<p class="cat-desc">' + desc + '</p>'
-            '<p class="cat-progress ' + progress_class + '">' + str(filled) + ' / ' + str(slots) +
-            ' signed up</p></div></div>',
-            unsafe_allow_html=True,
-        )
-    with cc2:
-        btn_label = "Full" if remaining == 0 else "Sign Up"
-        btn_key = f"signup_{idx}"
-        if st.button(btn_label, key=btn_key, use_container_width=True):
-            sign_up_dialog(name if name else display_name, signed_families, allergies)
-        if remaining == 0:
+        cc1, cc2 = st.columns([3, 1.1])
+        with cc1:
+            progress_class = "full" if remaining == 0 else ""
             st.markdown(
-                '<style>.st-key-' + btn_key + ' button {background-color:#f0ebe0 !important; '
-                'color:#6b6355 !important; border:none !important;}</style>',
+                '<div class="cat-row"><div class="cat-avatar">' + cat_icon(name) + '</div>'
+                '<div><p class="cat-name">' + display_name + '</p>'
+                '<p class="cat-desc">' + desc + '</p>'
+                '<p class="cat-progress ' + progress_class + '">' + str(filled) + ' / ' + str(slots) +
+                ' signed up</p></div></div>',
                 unsafe_allow_html=True,
             )
-        else:
-            st.markdown(
-                '<style>.st-key-' + btn_key + ' button {background-color:#4f8a68 !important; '
-                'color:white !important; border:none !important;}</style>',
-                unsafe_allow_html=True,
-            )
+        with cc2:
+            btn_label = "Full" if remaining == 0 else "Sign Up"
+            btn_key = f"signup_{idx}"
+            if st.button(btn_label, key=btn_key, use_container_width=True):
+                sign_up_dialog(name if name else display_name, signed_families, allergies)
+            if remaining == 0:
+                st.markdown(
+                    '<style>.st-key-' + btn_key + ' button {background-color:#e4dcc8 !important; '
+                    'color:#4a4438 !important; border:none !important; font-weight:700 !important;}</style>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(
+                    '<style>.st-key-' + btn_key + ' button {background-color:#12a894 !important; '
+                    'color:white !important; border:none !important;}</style>',
+                    unsafe_allow_html=True,
+                )
 
-    if matches:
-        st.markdown('<div class="who-label">Who\'s bringing it</div>', unsafe_allow_html=True)
-    for fam in matches:
-        d = signed_families[fam]
-        fcolor = FAMILY_COLORS.get(fam, "#1f2937")
-        r1, r2 = st.columns([4, 1])
-        with r1:
-            st.markdown(
-                '<div class="signee-row"><span class="signee-left">'
-                '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
-                '<span class="signee-name">The ' + fam + ' Family</span></span>'
-                '<span class="signee-detail">' + str(d['count']) + ' people</span></div>',
-                unsafe_allow_html=True,
-            )
-        with r2:
-            if admin_visible:
-                rkey = f"rm_cat_signee_{idx}_{fam}"
-                if st.button("Remove", key=rkey):
-                    remove_signup(fam)
-                    st.rerun()
-                small_remove_css(rkey)
-    st.markdown("</div>", unsafe_allow_html=True)
+        if matches:
+            st.markdown('<div class="who-label">Who\'s bringing it</div>', unsafe_allow_html=True)
+        for fam in matches:
+            d = signed_families[fam]
+            fcolor = FAMILY_COLORS.get(fam, "#1f2937")
+            r1, r2 = st.columns([4, 1])
+            with r1:
+                st.markdown(
+                    '<div class="signee-row"><span class="signee-left">'
+                    '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
+                    '<span class="signee-name">The ' + fam + ' Family</span></span>'
+                    '<span class="signee-detail">' + str(d['count']) + ' people</span></div>',
+                    unsafe_allow_html=True,
+                )
+            with r2:
+                if admin_visible:
+                    rkey = f"rm_cat_signee_{idx}_{fam}"
+                    if st.button("Remove", key=rkey):
+                        remove_signup(fam)
+                        st.rerun()
+                    small_remove_css(rkey)
 
 if admin_visible:
     if st.button("+ Add Category", key="add_cat_btn", use_container_width=True):
