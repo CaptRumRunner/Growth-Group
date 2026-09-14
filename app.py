@@ -720,11 +720,18 @@ for idx, cat in enumerate(event["categories"]):
         'box-shadow: 0 2px 6px rgba(0,0,0,0.25) !important; '
         'background:#161b22 !important; padding:0.5rem 0.7rem !important; margin-bottom:0.5rem !important;}'
         '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] '
-        '{gap: 0.05rem !important; border:none !important; box-shadow:none !important; background:transparent !important;}'
-        '.st-key-' + card_key + ' [data-testid="element-container"] {margin-bottom: 0 !important; border:none !important;}'
-        '.st-key-' + card_key + ' [data-testid="column"] {border:none !important; box-shadow:none !important;}'
+        '{gap: 0rem !important; border:none !important; box-shadow:none !important; background:transparent !important;}'
+        '.st-key-' + card_key + ' [data-testid="element-container"], '
+        '.st-key-' + card_key + ' [data-testid="stElementContainer"], '
+        '.st-key-' + card_key + ' [data-testid="stMarkdownContainer"] '
+        '{margin:0 !important; padding:0 !important; border:none !important;}'
+        '.st-key-' + card_key + ' [data-testid="column"], '
+        '.st-key-' + card_key + ' [data-testid="stHorizontalBlock"] '
+        '{border:none !important; box-shadow:none !important; margin:0 !important; gap:0.4rem !important;}'
         '.st-key-' + card_key + ' [data-testid="column"]:last-child {display:flex !important; '
-        'align-items:center !important; justify-content:center !important;}</style>',
+        'align-items:center !important; justify-content:center !important;}'
+        '.st-key-' + card_key + ' .who-label {margin:0 !important; padding:0 !important;}'
+        '.st-key-' + card_key + ' .signee-row {margin-top:0.1rem !important;}</style>',
         unsafe_allow_html=True,
     )
 
