@@ -23,7 +23,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from datetime import date, datetime, timedelta
 
-st.set_page_config(page_title="SBC Growth Group", page_icon=":books:", layout="centered")
+st.set_page_config(page_title="Growth Group", page_icon=":books:", layout="centered")
 
 PENCIL = "\u270e"
 
@@ -56,7 +56,7 @@ DEFAULT_HERO_IMAGE = (
 DEFAULT_EVENT = {
     "address": "17136 Mark Dr, Macomb, MI 48044",
     "house_desc": "",
-    "time": "5:00 PM",
+    "time": "5:00 PM - 7:30 PM",
     "upcoming_dates": [],  # list of ISO "YYYY-MM-DD" strings
     "hero_image_url": DEFAULT_HERO_IMAGE,
     "hero_title": "Bible Study & Fellowship",
@@ -81,6 +81,9 @@ DEFAULT_EVENT = {
 # ----------------------------------------------------------------------
 # Icons -- single-line SVG strings only (multi-line breaks HTML rendering)
 # ----------------------------------------------------------------------
+SBC_LOGO_B64 = "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"
+SBC_LOGO_IMG = '<img src="data:image/png;base64,' + SBC_LOGO_B64 + '" width="32" height="32" style="border-radius:50%; display:block;">'
+
 ICON_LEAF = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#e8a33d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 11 13.6 12 12"></path></svg>'
 ICON_CAL = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#e8a33d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
 ICON_PIN = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#e8a33d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>'
@@ -185,7 +188,7 @@ st.markdown(
     '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.78rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0;}'
     '.cat-qty-slim.full {color:#6b7280 !important;}'
     '.cat-progress.full {color:#6b7280 !important;}'
-    '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.25rem;}'
+    '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0;}'
     '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.35rem 0.65rem; margin-top:0.15rem; font-size:0.87rem;}'
     '.signee-left {display:flex; align-items:center;}'
     '.signee-avatar {width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#0d1117 !important; font-size:0.7rem; font-weight:900; margin-right:0.55rem; flex-shrink:0;}'
@@ -543,8 +546,8 @@ with st.container(key="brandrow"):
     b1, b2 = st.columns([4, 1])
     with b1:
         st.markdown(
-            '<div class="brand-row">' + ICON_LEAF +
-            '<div><p class="brand-name">SBC Growth Group</p>'
+            '<div class="brand-row">' + SBC_LOGO_IMG +
+            '<div><p class="brand-name">Growth Group</p>'
             '<p class="brand-sub">Study &middot; Grow &middot; Belong'
             '<span class="version-tag">v1.' + str(get_version()) + '</span></p></div></div>',
             unsafe_allow_html=True,
@@ -717,7 +720,7 @@ for idx, cat in enumerate(event["categories"]):
         'box-shadow: 0 2px 6px rgba(0,0,0,0.25) !important; '
         'background:#161b22 !important; padding:0.5rem 0.7rem !important; margin-bottom:0.5rem !important;}'
         '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] '
-        '{gap: 0.15rem !important; border:none !important; box-shadow:none !important; background:transparent !important;}'
+        '{gap: 0.05rem !important; border:none !important; box-shadow:none !important; background:transparent !important;}'
         '.st-key-' + card_key + ' [data-testid="element-container"] {margin-bottom: 0 !important; border:none !important;}'
         '.st-key-' + card_key + ' [data-testid="column"] {border:none !important; box-shadow:none !important;}'
         '.st-key-' + card_key + ' [data-testid="column"]:last-child {display:flex !important; '
