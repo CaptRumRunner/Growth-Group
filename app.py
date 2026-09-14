@@ -55,7 +55,7 @@ DEFAULT_HERO_IMAGE = (
 
 DEFAULT_EVENT = {
     "address": "17136 Mark Dr, Macomb, MI 48044",
-    "house_desc": "",
+    "house_desc": "Red brick, white siding",
     "time": "5:00 PM - 7:30 PM",
     "upcoming_dates": [],  # list of ISO "YYYY-MM-DD" strings
     "hero_image_url": DEFAULT_HERO_IMAGE,
@@ -149,8 +149,9 @@ st.markdown(
     "html, body, [class*='css'] { font-family: 'Inter', sans-serif; color:#f3f4f6; }"
     '.block-container {padding-top: 0.5rem; padding-bottom: 1.6rem; max-width: 560px;}'
     '.brand-row {display:flex; align-items:center; gap:0.5rem;}'
-    ".brand-name {font-family:'Inter', sans-serif; font-size:1.5rem; font-weight:900; color:#f3f4f6 !important; margin:0; letter-spacing:0.01em;}"
-    '.brand-sub {font-size:0.75rem; color:#9ca3af !important; margin-top:-0.1rem; text-transform:uppercase; letter-spacing:0.05em;}'
+    ".brand-name {font-family:'Inter', sans-serif; font-size:1.5rem; font-weight:900; margin:0; letter-spacing:0.01em; "
+    "background: linear-gradient(90deg, #e8a33d, #f2b134, #ef6f61); -webkit-background-clip: text; background-clip: text; color: transparent;}"
+    '.brand-sub {font-size:0.75rem; color:#c9a97a !important; margin-top:-0.1rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:600;}'
     '.st-key-admin_toggle_btn button {padding: 0.2rem 0.9rem !important; font-size: 0.78rem !important; min-height: 0 !important; margin-top: 0.35rem; font-weight:800 !important; text-transform:uppercase; letter-spacing:0.04em;}'
     '.hero {position: relative; border-radius: 16px; overflow: hidden; margin: 0.15rem 0 0.8rem 0; color:#f3f4f6; min-height: 190px; background: linear-gradient(120deg, #2a2115 0%, #3a2f1c 45%, #4a3a20 100%); background-size: cover; background-position: center; border:1px solid #2a2f3a;}'
     '.hero-overlay {position: absolute; inset: 0; z-index: 2; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, rgba(8,10,14,0.75), rgba(8,10,14,0.9)); padding: 1.3rem 1.2rem;}'
