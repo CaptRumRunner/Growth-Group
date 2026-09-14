@@ -55,6 +55,7 @@ DEFAULT_HERO_IMAGE = (
 
 DEFAULT_EVENT = {
     "address": "17136 Mark Dr, Macomb, MI 48044",
+    "house_desc": "",
     "time": "5:00 PM",
     "upcoming_dates": [],  # list of ISO "YYYY-MM-DD" strings
     "hero_image_url": DEFAULT_HERO_IMAGE,
@@ -458,9 +459,13 @@ def edit_hero_dialog(event):
 @st.dialog("Edit Location")
 def edit_location_dialog(event):
     new_address = st.text_input("Address", value=event["address"])
+    new_house_desc = st.text_input(
+        "House description (e.g. 'Red brick, white siding')",
+        value=event.get("house_desc", ""),
+    )
     c1, c2 = st.columns(2)
     if c1.button("Save", type="primary", use_container_width=True):
-        save_event({"address": new_address})
+        save_event({"address": new_address, "house_desc": new_house_desc})
         st.rerun()
     if c2.button("Cancel", use_container_width=True):
         st.rerun()
@@ -610,10 +615,14 @@ with s1:
             edit_meeting_dialog(event)
         pencil_css("edit_meeting_btn")
 with s2:
+    house_line = (
+        '<div style="color:#9ca3af; font-size:0.78rem; margin-top:0.15rem;">' + event['house_desc'] + '</div>'
+        if event.get('house_desc') else ''
+    )
     st.markdown(
         '<div class="stat-card"><div class="stat-row">' + ICON_PIN +
         '<div><div class="stat-label">Location</div>'
-        '<div class="stat-value">' + event['address'] + '</div></div>'
+        '<div class="stat-value">' + event['address'] + '</div>' + house_line + '</div>'
         '</div></div>',
         unsafe_allow_html=True,
     )
@@ -703,16 +712,14 @@ for idx, cat in enumerate(event["categories"]):
     card_key = f"catcard_{idx}"
 
     st.markdown(
-        '<style>.st-key-' + card_key + ', .st-key-' + card_key + ' > div, '
-        '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"], '
-        '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] '
+        '<style>.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"] '
         '{border:1.5px solid #2a2f3a !important; border-radius:12px !important; '
         'box-shadow: 0 2px 6px rgba(0,0,0,0.25) !important; '
-        'background:#161b22 !important;}'
-        '.st-key-' + card_key + ' [data-testid="stVerticalBlockBorderWrapper"] '
-        '{padding:0.5rem 0.7rem !important; margin-bottom:0.5rem !important;}'
-        '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] {gap: 0.15rem !important;}'
-        '.st-key-' + card_key + ' [data-testid="element-container"] {margin-bottom: 0 !important;}'
+        'background:#161b22 !important; padding:0.5rem 0.7rem !important; margin-bottom:0.5rem !important;}'
+        '.st-key-' + card_key + ' [data-testid="stVerticalBlock"] '
+        '{gap: 0.15rem !important; border:none !important; box-shadow:none !important; background:transparent !important;}'
+        '.st-key-' + card_key + ' [data-testid="element-container"] {margin-bottom: 0 !important; border:none !important;}'
+        '.st-key-' + card_key + ' [data-testid="column"] {border:none !important; box-shadow:none !important;}'
         '.st-key-' + card_key + ' [data-testid="column"]:last-child {display:flex !important; '
         'align-items:center !important; justify-content:center !important;}</style>',
         unsafe_allow_html=True,
