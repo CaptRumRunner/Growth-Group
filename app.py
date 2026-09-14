@@ -188,8 +188,8 @@ st.markdown(
     '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.78rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0;}'
     '.cat-qty-slim.full {color:#6b7280 !important;}'
     '.cat-progress.full {color:#6b7280 !important;}'
-    '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0;}'
-    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.35rem 0.65rem; margin-top:0.15rem; font-size:0.87rem;}'
+    '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.3rem;}'
+    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.3rem 0.6rem; margin-top:0.15rem; font-size:0.85rem;}'
     '.signee-left {display:flex; align-items:center;}'
     '.signee-avatar {width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#0d1117 !important; font-size:0.7rem; font-weight:900; margin-right:0.55rem; flex-shrink:0;}'
     '.signee-name {font-weight:800; color:#f3f4f6 !important;}'
@@ -739,14 +739,31 @@ for idx, cat in enumerate(event["categories"]):
         cc1, cc2 = st.columns([3, 1.1])
         with cc1:
             progress_class = "full" if remaining == 0 else ""
-            st.markdown(
+
+            block_html = (
                 '<div class="cat-row-slim"><div class="cat-avatar-sm">' + cat_icon(name) + '</div>'
                 '<span class="cat-name-slim">' + display_name + '</span>'
                 '<span class="cat-desc-slim">' + desc + '</span>'
                 '<span class="cat-qty-slim ' + progress_class + '">' + str(filled) + '/' + str(slots) +
-                ' needed</span></div>',
-                unsafe_allow_html=True,
+                ' needed</span></div>'
             )
+            if matches and not admin_visible:
+                # Fold the "who's bringing it" list into the SAME markdown
+                # call as the header row -- separate st.markdown/st.columns
+                # calls each get their own automatic spacing from Streamlit
+                # that CSS overrides couldn't reliably suppress, so folding
+                # everything into one HTML block sidesteps that entirely.
+                block_html += '<div class="who-label">Who\'s bringing it</div>'
+                for fam in matches:
+                    d = signed_families[fam]
+                    fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
+                    block_html += (
+                        '<div class="signee-row"><span class="signee-left">'
+                        '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
+                        '<span class="signee-name">The ' + fam + ' Family</span></span>'
+                        '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
+                    )
+            st.markdown(block_html, unsafe_allow_html=True)
         with cc2:
             btn_label = "Full" if remaining == 0 else "Sign Up"
             btn_key = f"signup_{idx}"
@@ -765,18 +782,20 @@ for idx, cat in enumerate(event["categories"]):
                     unsafe_allow_html=True,
                 )
 
-        if matches:
+        # Admin mode needs a Remove button per family, so those rows stay as
+        # separate Streamlit widgets (and therefore keep Streamlit's normal
+        # spacing) only while the host panel is open.
+        if matches and admin_visible:
             st.markdown('<div class="who-label">Who\'s bringing it</div>', unsafe_allow_html=True)
-        for fam in matches:
-            d = signed_families[fam]
-            fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
-            row_html = (
-                '<div class="signee-row"><span class="signee-left">'
-                '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
-                '<span class="signee-name">The ' + fam + ' Family</span></span>'
-                '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
-            )
-            if admin_visible:
+            for fam in matches:
+                d = signed_families[fam]
+                fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
+                row_html = (
+                    '<div class="signee-row"><span class="signee-left">'
+                    '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
+                    '<span class="signee-name">The ' + fam + ' Family</span></span>'
+                    '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
+                )
                 r1, r2 = st.columns([4, 1])
                 with r1:
                     st.markdown(row_html, unsafe_allow_html=True)
@@ -786,8 +805,6 @@ for idx, cat in enumerate(event["categories"]):
                         remove_signup(fam)
                         st.rerun()
                     small_remove_css(rkey)
-            else:
-                st.markdown(row_html, unsafe_allow_html=True)
 
 # ----------------------------------------------------------------------
 # Admin bottom strip: bulk food overview + clear-for-new-night + lock
