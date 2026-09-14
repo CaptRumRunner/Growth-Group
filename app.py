@@ -21,6 +21,7 @@ Icons are inline SVGs; edit controls use the plain Unicode pencil glyph
 import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
+import anthropic
 from datetime import date, datetime, timedelta
 
 st.set_page_config(page_title="Growth Group", page_icon=":books:", layout="centered")
@@ -274,6 +275,36 @@ def get_db():
 db = get_db()
 ADMIN_PIN = st.secrets.get("admin_pin", "2468")
 
+
+# ----------------------------------------------------------------------
+# AI meal-planning assistant (optional -- only active if an API key is set)
+# ----------------------------------------------------------------------
+@st.cache_resource
+def get_ai_client():
+    key = st.secrets.get("anthropic_api_key")
+    if not key:
+        return None
+    return anthropic.Anthropic(api_key=key)
+
+
+def ai_available():
+    return get_ai_client() is not None
+
+
+def ask_ai(prompt, max_tokens=600):
+    client = get_ai_client()
+    if not client:
+        return None
+    try:
+        resp = client.messages.create(
+            model="claude-sonnet-5",
+            max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return "".join(block.text for block in resp.content if hasattr(block, "text"))
+    except Exception as e:
+        return "Sorry, the AI suggestion couldn't be generated right now (" + str(e) + ")."
+
 # ----------------------------------------------------------------------
 # Data access
 # ----------------------------------------------------------------------
@@ -329,8 +360,8 @@ def load_signups():
     return {d.id: d.to_dict() for d in docs}
 
 
-def save_signup(family, category, count):
-    db.collection("signups").document(family).set({"category": category, "count": count})
+def save_signup(family, category, count, dish=""):
+    db.collection("signups").document(family).set({"category": category, "count": count, "dish": dish})
     bump_version()
 
 
@@ -379,7 +410,7 @@ def admin_pin_dialog():
 
 
 @st.dialog("Sign up to bring something")
-def sign_up_dialog(category_name, signed_families, allergies):
+def sign_up_dialog(category_name, category_desc, signed_families, allergies):
     st.markdown(f"Signing up for **{category_name}**")
     fam_names = list(FAMILIES.keys())
     last = st.session_state.get("last_family")
@@ -390,6 +421,37 @@ def sign_up_dialog(category_name, signed_families, allergies):
     count = st.number_input(
         "How many attending", min_value=0, max_value=15, value=default_count, step=1, key="dlg_count"
     )
+
+    if ai_available():
+        others = [
+            (f, d.get("dish", "")) for f, d in signed_families.items()
+            if d.get("category") == category_name and f != family and d.get("dish")
+        ]
+        if st.button("Get AI dish ideas", key="dlg_ai_btn"):
+            others_text = (
+                "; ".join(f"{f} is bringing {dish}" for f, dish in others)
+                if others else "no one else has specified a dish yet"
+            )
+            prompt = (
+                f"I'm helping coordinate a small church potluck-style gathering. A family is "
+                f"signing up to bring something for the '{category_name}' category "
+                f"(described as: {category_desc or 'no description given'}). "
+                f"They are bringing food for {count} people. "
+                f"Here's who else is already signed up for this same category: {others_text}. "
+                f"Suggest 3 specific, simple dish ideas for this category that would NOT duplicate "
+                f"what others are already bringing, sized appropriately for feeding about {count} people "
+                f"as part of a larger shared meal (not the whole meal). Keep it to a short bulleted list, "
+                f"no more than 2 short lines total, casual and practical, no preamble."
+            )
+            with st.spinner("Thinking of some ideas..."):
+                st.session_state["dlg_ai_result"] = ask_ai(prompt)
+        if st.session_state.get("dlg_ai_result"):
+            st.info(st.session_state["dlg_ai_result"])
+
+    dish = st.text_input(
+        "What are you bringing? (optional, helps avoid duplicates)",
+        value=(current.get("dish", "") if current else ""), key="dlg_dish",
+    )
     allergy_note = st.text_input(
         "Allergies / dietary notes (optional)", value=allergies.get(family, ""), key="dlg_allergy"
     )
@@ -398,6 +460,7 @@ def sign_up_dialog(category_name, signed_families, allergies):
     c1, c2 = st.columns(2)
     with c1:
         if st.button("Cancel", key="dlg_cancel_btn", use_container_width=True):
+            st.session_state.pop("dlg_ai_result", None)
             st.rerun()
         st.markdown(
             '<style>[data-testid="stDialog"] .st-key-dlg_cancel_btn button, '
@@ -408,9 +471,10 @@ def sign_up_dialog(category_name, signed_families, allergies):
         )
     with c2:
         if st.button("Confirm", key="dlg_confirm_btn", use_container_width=True):
-            save_signup(family, category_name, count)
+            save_signup(family, category_name, count, dish.strip())
             save_allergy(family, allergy_note.strip())
             st.session_state.last_family = family
+            st.session_state.pop("dlg_ai_result", None)
             st.rerun()
         st.markdown(
             '<style>[data-testid="stDialog"] .st-key-dlg_confirm_btn button, '
@@ -758,10 +822,11 @@ for idx, cat in enumerate(event["categories"]):
                 for fam in matches:
                     d = signed_families[fam]
                     fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
+                    dish_bit = (' -- ' + d['dish']) if d.get('dish') else ''
                     block_html += (
                         '<div class="signee-row"><span class="signee-left">'
                         '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
-                        '<span class="signee-name">The ' + fam + ' Family</span></span>'
+                        '<span class="signee-name">The ' + fam + ' Family' + dish_bit + '</span></span>'
                         '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
                     )
             st.markdown(block_html, unsafe_allow_html=True)
@@ -769,7 +834,7 @@ for idx, cat in enumerate(event["categories"]):
             btn_label = "Full" if remaining == 0 else "Sign Up"
             btn_key = f"signup_{idx}"
             if st.button(btn_label, key=btn_key, use_container_width=True):
-                sign_up_dialog(name if name else display_name, signed_families, allergies)
+                sign_up_dialog(name if name else display_name, desc, signed_families, allergies)
             if remaining == 0:
                 st.markdown(
                     '<style>.st-key-' + btn_key + ' button {background-color:#2a2f3a !important; '
@@ -791,10 +856,11 @@ for idx, cat in enumerate(event["categories"]):
             for fam in matches:
                 d = signed_families[fam]
                 fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
+                dish_bit = (' -- ' + d['dish']) if d.get('dish') else ''
                 row_html = (
                     '<div class="signee-row"><span class="signee-left">'
                     '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
-                    '<span class="signee-name">The ' + fam + ' Family</span></span>'
+                    '<span class="signee-name">The ' + fam + ' Family' + dish_bit + '</span></span>'
                     '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
                 )
                 r1, r2 = st.columns([4, 1])
@@ -872,6 +938,39 @@ if admin_visible:
             cats.append({"name": "" if new_name == "Not set yet" else new_name, "desc": new_desc, "slots": int(new_qty)})
             save_event({"categories": cats})
             st.rerun()
+
+    st.divider()
+    st.markdown("**AI Meal Planner**")
+    if not ai_available():
+        st.caption(
+            "Add an `anthropic_api_key` to this app's Secrets to turn this on -- get a key at "
+            "console.anthropic.com, then add it as a top-level line: anthropic_api_key = \"sk-ant-...\""
+        )
+    else:
+        st.caption(
+            "Get AI suggestions for balancing categories and quantities based on how many people "
+            "are actually coming. This only suggests -- nothing is added automatically; use the "
+            "category tools above to apply anything you like."
+        )
+        if st.button("Suggest a balanced lineup"):
+            cat_summary = "; ".join(
+                f"{c['name'] or 'untitled'} (needs {c.get('slots', 0)}, "
+                f"{len([f for f, d in signed_families.items() if d['category'] == c['name']])} signed up)"
+                for c in event["categories"]
+            ) or "no categories set yet"
+            prompt = (
+                f"I'm coordinating food for a small church small-group gathering of about "
+                f"{len(signed_families)} families ({total_people} people total). "
+                f"Current food categories and how full they are: {cat_summary}. "
+                f"Based on typical potluck planning for this size group, suggest whether the "
+                f"quantities needed per category look well-balanced, and recommend any changes "
+                f"(add/remove a category, raise/lower a quantity). Be specific and concise -- a short "
+                f"bulleted list, no more than 5 bullets, no preamble or sign-off."
+            )
+            with st.spinner("Thinking through the lineup..."):
+                st.session_state["host_ai_result"] = ask_ai(prompt)
+        if st.session_state.get("host_ai_result"):
+            st.info(st.session_state["host_ai_result"])
 
     st.divider()
     st.markdown("**Start a new night**")
