@@ -18,10 +18,12 @@ Icons are inline SVGs; edit controls use the plain Unicode pencil glyph
 "\u270e" rather than a multi-byte emoji, to avoid copy/paste corruption.
 """
 
+import json
 import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
 import anthropic
+from streamlit_js_eval import streamlit_js_eval
 from datetime import date, datetime, timedelta
 
 st.set_page_config(page_title="Growth Group", page_icon=":books:", layout="centered")
@@ -34,6 +36,7 @@ FAMILIES = {
     "Lee": ["Ben Lee", "Lisa Lee"],
     "Russell": ["Mark Russell", "Megan Russell"],
     "Siefert": ["Scott Siefert", "Susan Siefert"],
+    "Davis": ["Mark Davis", "Kim Davis"],
 }
 
 FAMILY_COLORS = {
@@ -42,6 +45,7 @@ FAMILY_COLORS = {
     "Lee": "#34d399",
     "Russell": "#60a5fa",
     "Siefert": "#c084fc",
+    "Davis": "#5eead4",
 }
 
 TYPICAL_CATEGORIES = [
@@ -291,19 +295,42 @@ def ai_available():
     return get_ai_client() is not None
 
 
-def ask_ai(prompt, max_tokens=600):
-    client = get_ai_client()
-    if not client:
-        return None
-    try:
-        resp = client.messages.create(
-            model="claude-sonnet-5",
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        return "".join(block.text for block in resp.content if hasattr(block, "text"))
-    except Exception as e:
-        return "Sorry, the AI suggestion couldn't be generated right now (" + str(e) + ")."
+def render_ai_chat(session_key, system_prompt, placeholder="Ask a question..."):
+    """A small persistent chat panel. Keeps its own history in
+    st.session_state under session_key; system_prompt is a callable so it
+    can reflect the latest event/signup data on every turn."""
+    if session_key not in st.session_state:
+        st.session_state[session_key] = []
+    history = st.session_state[session_key]
+
+    for msg in history:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    with st.form(key=session_key + "_form", clear_on_submit=True):
+        user_msg = st.text_input(placeholder, key=session_key + "_input", label_visibility="collapsed")
+        send_clicked = st.form_submit_button("Send", use_container_width=True)
+
+    if st.button("Clear chat", key=session_key + "_clear"):
+        st.session_state[session_key] = []
+        st.rerun()
+
+    if send_clicked and user_msg.strip():
+        history.append({"role": "user", "content": user_msg.strip()})
+        client = get_ai_client()
+        try:
+            resp = client.messages.create(
+                model="claude-sonnet-5",
+                max_tokens=700,
+                system=system_prompt(),
+                messages=history,
+            )
+            reply = "".join(b.text for b in resp.content if hasattr(b, "text"))
+        except Exception as e:
+            reply = "Sorry, something went wrong talking to the AI (" + str(e) + ")."
+        history.append({"role": "assistant", "content": reply})
+        st.session_state[session_key] = history
+        st.rerun()
 
 # ----------------------------------------------------------------------
 # Data access
@@ -394,21 +421,6 @@ def remove_allergy(family):
 # ----------------------------------------------------------------------
 # Dialogs
 # ----------------------------------------------------------------------
-@st.dialog("Host PIN")
-def admin_pin_dialog():
-    pin = st.text_input("Enter host PIN", type="password", key="pin_dialog_input")
-    c1, c2 = st.columns(2)
-    if c1.button("Unlock", type="primary", use_container_width=True):
-        if pin == str(ADMIN_PIN):
-            st.session_state.admin_ok = True
-            st.session_state.admin_open = True
-            st.rerun()
-        else:
-            st.error("Incorrect PIN.")
-    if c2.button("Cancel", use_container_width=True):
-        st.rerun()
-
-
 @st.dialog("Sign up to bring something")
 def sign_up_dialog(category_name, category_desc, signed_families, allergies):
     st.markdown(f"Signing up for **{category_name}**")
@@ -422,32 +434,6 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
         "How many attending", min_value=0, max_value=15, value=default_count, step=1, key="dlg_count"
     )
 
-    if ai_available():
-        others = [
-            (f, d.get("dish", "")) for f, d in signed_families.items()
-            if d.get("category") == category_name and f != family and d.get("dish")
-        ]
-        if st.button("Get AI dish ideas", key="dlg_ai_btn"):
-            others_text = (
-                "; ".join(f"{f} is bringing {dish}" for f, dish in others)
-                if others else "no one else has specified a dish yet"
-            )
-            prompt = (
-                f"I'm helping coordinate a small church potluck-style gathering. A family is "
-                f"signing up to bring something for the '{category_name}' category "
-                f"(described as: {category_desc or 'no description given'}). "
-                f"They are bringing food for {count} people. "
-                f"Here's who else is already signed up for this same category: {others_text}. "
-                f"Suggest 3 specific, simple dish ideas for this category that would NOT duplicate "
-                f"what others are already bringing, sized appropriately for feeding about {count} people "
-                f"as part of a larger shared meal (not the whole meal). Keep it to a short bulleted list, "
-                f"no more than 2 short lines total, casual and practical, no preamble."
-            )
-            with st.spinner("Thinking of some ideas..."):
-                st.session_state["dlg_ai_result"] = ask_ai(prompt)
-        if st.session_state.get("dlg_ai_result"):
-            st.info(st.session_state["dlg_ai_result"])
-
     dish = st.text_input(
         "What are you bringing? (optional, helps avoid duplicates)",
         value=(current.get("dish", "") if current else ""), key="dlg_dish",
@@ -455,12 +441,39 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
     allergy_note = st.text_input(
         "Allergies / dietary notes (optional)", value=allergies.get(family, ""), key="dlg_allergy"
     )
+
+    if ai_available():
+        with st.expander("Chat with the meal-idea assistant"):
+            def _family_system_prompt():
+                others = [
+                    (f, d.get("dish", "")) for f, d in signed_families.items()
+                    if d.get("category") == category_name and f != family and d.get("dish")
+                ]
+                others_text = (
+                    "; ".join(f"{f} is bringing {dish}" for f, dish in others)
+                    if others else "no one else has specified a dish yet"
+                )
+                return (
+                    f"You are a friendly, practical meal-idea assistant helping a family decide what to "
+                    f"bring to a small church potluck-style gathering. This family signed up for the "
+                    f"'{category_name}' category (described as: {category_desc or 'no description given'}), "
+                    f"and is feeding about {count} people as part of a larger shared meal (not the whole meal). "
+                    f"Here's who else is already signed up for this same category: {others_text}. "
+                    f"Give specific, simple dish ideas that would not duplicate what others are bringing. "
+                    f"Keep replies short and conversational -- a few sentences or a short bulleted list, "
+                    f"no long preamble. You can't add anything to the sign-up sheet yourself; if they land "
+                    f"on an idea, remind them to type it into the 'What are you bringing?' box."
+                )
+            render_ai_chat(
+                f"dlg_ai_chat_{category_name}", _family_system_prompt,
+                "Ask for dish ideas, ask to scale a recipe, etc.",
+            )
+
     if current and current["category"] != category_name:
         st.caption(f"{family} is currently signed up for {current['category']}. Confirming moves them here.")
     c1, c2 = st.columns(2)
     with c1:
         if st.button("Cancel", key="dlg_cancel_btn", use_container_width=True):
-            st.session_state.pop("dlg_ai_result", None)
             st.rerun()
         st.markdown(
             '<style>[data-testid="stDialog"] .st-key-dlg_cancel_btn button, '
@@ -474,7 +487,6 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
             save_signup(family, category_name, count, dish.strip())
             save_allergy(family, allergy_note.strip())
             st.session_state.last_family = family
-            st.session_state.pop("dlg_ai_result", None)
             st.rerun()
         st.markdown(
             '<style>[data-testid="stDialog"] .st-key-dlg_confirm_btn button, '
@@ -595,6 +607,10 @@ if "admin_ok" not in st.session_state:
     st.session_state.admin_ok = False
 if "show_dates_editor" not in st.session_state:
     st.session_state.show_dates_editor = False
+if "awaiting_pin" not in st.session_state:
+    st.session_state.awaiting_pin = False
+if "host_prompt_attempt" not in st.session_state:
+    st.session_state.host_prompt_attempt = 0
 
 is_admin = st.session_state.admin_ok
 admin_visible = is_admin and st.session_state.admin_open
@@ -618,11 +634,34 @@ with st.container(key="brandrow"):
             unsafe_allow_html=True,
         )
     with b2:
-        if st.button("Host", key="admin_toggle_btn"):
+        host_icon = ":material/lock_open:" if is_admin else ":material/lock:"
+        if st.button("Host", key="admin_toggle_btn", icon=host_icon):
             if is_admin:
                 st.session_state.admin_open = not st.session_state.admin_open
             else:
-                admin_pin_dialog()
+                st.session_state.host_prompt_attempt += 1
+                st.session_state.awaiting_pin = True
+
+if st.session_state.awaiting_pin:
+    prompt_key = "host_pin_prompt_" + str(st.session_state.host_prompt_attempt)
+    raw_result = streamlit_js_eval(
+        js_expressions="JSON.stringify({pin: prompt('Enter the host PIN to manage the group:')})",
+        key=prompt_key,
+        want_output=True,
+    )
+    if raw_result is not None:
+        st.session_state.awaiting_pin = False
+        try:
+            entered_pin = json.loads(raw_result).get("pin")
+        except (TypeError, ValueError):
+            entered_pin = None
+        if entered_pin is not None:
+            if str(entered_pin) == str(ADMIN_PIN):
+                st.session_state.admin_ok = True
+                st.session_state.admin_open = True
+            else:
+                st.toast("Incorrect PIN.")
+        st.rerun()
 
 if st.session_state.admin_open:
     st.markdown(
@@ -948,29 +987,34 @@ if admin_visible:
         )
     else:
         st.caption(
-            "Get AI suggestions for balancing categories and quantities based on how many people "
-            "are actually coming. This only suggests -- nothing is added automatically; use the "
-            "category tools above to apply anything you like."
+            "Chat about balancing categories, quantities, or meal ideas based on who's actually "
+            "coming. This only suggests -- nothing is added automatically; use the category tools "
+            "above to apply anything you like."
         )
-        if st.button("Suggest a balanced lineup"):
+
+        def _host_system_prompt():
             cat_summary = "; ".join(
                 f"{c['name'] or 'untitled'} (needs {c.get('slots', 0)}, "
                 f"{len([f for f, d in signed_families.items() if d['category'] == c['name']])} signed up)"
                 for c in event["categories"]
             ) or "no categories set yet"
-            prompt = (
-                f"I'm coordinating food for a small church small-group gathering of about "
-                f"{len(signed_families)} families ({total_people} people total). "
-                f"Current food categories and how full they are: {cat_summary}. "
-                f"Based on typical potluck planning for this size group, suggest whether the "
-                f"quantities needed per category look well-balanced, and recommend any changes "
-                f"(add/remove a category, raise/lower a quantity). Be specific and concise -- a short "
-                f"bulleted list, no more than 5 bullets, no preamble or sign-off."
+            dishes = "; ".join(
+                f"{f} is bringing {d['dish']}" for f, d in signed_families.items() if d.get("dish")
+            ) or "no specific dishes named yet"
+            return (
+                f"You are a friendly, practical meal-planning assistant helping the host of a small "
+                f"church small-group gathering. Currently {len(signed_families)} families "
+                f"({total_people} people total) are signed up. Food categories and how full they "
+                f"are: {cat_summary}. Specific dishes named so far: {dishes}. "
+                f"Help the host think through whether quantities are well-balanced for this group "
+                f"size, suggest categories or dishes to add for variety, and answer any other "
+                f"meal-planning questions they have. Keep replies concise and conversational -- a "
+                f"few sentences or a short bulleted list, no long preamble. You can't change the app "
+                f"yourself; if the host decides on something, remind them to make the change using "
+                f"the category tools above."
             )
-            with st.spinner("Thinking through the lineup..."):
-                st.session_state["host_ai_result"] = ask_ai(prompt)
-        if st.session_state.get("host_ai_result"):
-            st.info(st.session_state["host_ai_result"])
+
+        render_ai_chat("host_ai_chat", _host_system_prompt, "Ask about quantities, balance, meal ideas...")
 
     st.divider()
     st.markdown("**Start a new night**")
