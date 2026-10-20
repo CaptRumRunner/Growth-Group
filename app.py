@@ -19,6 +19,8 @@ Icons are inline SVGs; edit controls use the plain Unicode pencil glyph
 """
 
 import json
+import re
+import html as _html
 import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -37,6 +39,7 @@ FAMILIES = {
     "Russell": ["Mark Russell", "Megan Russell"],
     "Siefert": ["Scott Siefert", "Susan Siefert"],
     "Davis": ["Mark Davis", "Kim Davis"],
+    "Maiuri": [],
 }
 
 FAMILY_COLORS = {
@@ -46,7 +49,21 @@ FAMILY_COLORS = {
     "Russell": "#60a5fa",
     "Siefert": "#c084fc",
     "Davis": "#5eead4",
+    "Maiuri": "#f472b6",
 }
+
+EXTRA_FAMILY_COLORS = ["#fb923c", "#a3e635", "#38bdf8", "#fbbf24", "#e879f9", "#2dd4bf", "#f87171"]
+
+
+def family_color(name):
+    if name in FAMILY_COLORS:
+        return FAMILY_COLORS[name]
+    return EXTRA_FAMILY_COLORS[sum(ord(c) for c in name) % len(EXTRA_FAMILY_COLORS)]
+
+
+def clean_family_name(raw):
+    """Strip characters that would break HTML or Firestore document ids."""
+    return re.sub(r'[<>&"\'`/\\]', "", (raw or "")).strip()[:40]
 
 TYPICAL_CATEGORIES = [
     "Main Dish", "Side Dish", "Salad", "Bread", "Appetizer",
@@ -68,6 +85,7 @@ DEFAULT_EVENT = {
     "hero_sub": "Food Brings Us Together",
     "hero_verse_text": "They broke bread in their homes and ate together with glad and sincere hearts.",
     "hero_verse_ref": "Acts 2:46",
+    "food_theme": "",
     "callout_text": (
         "Sign your family up below to bring a dish, drink, or item. Signing up also "
         "lets us know you're planning to be there -- thank you for helping make this "
@@ -382,6 +400,34 @@ def save_event(data):
     bump_version()
 
 
+def load_family_names():
+    doc = db.collection("meta").document("families").get()
+    if doc.exists:
+        names = doc.to_dict().get("names")
+        if names:
+            return list(names)
+    return list(FAMILIES.keys())
+
+
+def save_family_names(names):
+    db.collection("meta").document("families").set({"names": names})
+    bump_version()
+
+
+def add_family_name(raw):
+    """Returns (ok, message, cleaned_name)."""
+    name = clean_family_name(raw)
+    if not name:
+        return False, "Enter a last name first.", ""
+    names = load_family_names()
+    for n in names:
+        if n.lower() == name.lower():
+            return False, n + " is already in the list.", n
+    names.append(name)
+    save_family_names(names)
+    return True, "Added " + name + ".", name
+
+
 def load_signups():
     docs = db.collection("signups").stream()
     return {d.id: d.to_dict() for d in docs}
@@ -424,7 +470,7 @@ def remove_allergy(family):
 @st.dialog("Sign up to bring something")
 def sign_up_dialog(category_name, category_desc, signed_families, allergies):
     st.markdown(f"Signing up for **{category_name}**")
-    fam_names = list(FAMILIES.keys())
+    fam_names = load_family_names()
     last = st.session_state.get("last_family")
     default_idx = fam_names.index(last) if last in fam_names else 0
     family = st.selectbox("Your family", fam_names, index=default_idx, key="dlg_family")
@@ -435,12 +481,27 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
     )
 
     dish = st.text_input(
-        "What are you bringing? (optional, helps avoid duplicates)",
+        "What are you bringing?",
         value=(current.get("dish", "") if current else ""), key="dlg_dish",
     )
     allergy_note = st.text_input(
         "Allergies / dietary notes (optional)", value=allergies.get(family, ""), key="dlg_allergy"
     )
+
+    def _add_family_cb():
+        ok, msg, nm = add_family_name(st.session_state.get("dlg_new_family", ""))
+        st.session_state.dlg_family_msg = msg
+        if nm:
+            st.session_state.dlg_family = nm
+            st.session_state.last_family = nm
+        if ok:
+            st.session_state.dlg_new_family = ""
+
+    with st.expander("My family isn't listed"):
+        st.text_input("Family last name", key="dlg_new_family")
+        st.button("Add my family", key="dlg_add_family_btn", on_click=_add_family_cb)
+        if st.session_state.get("dlg_family_msg"):
+            st.caption(st.session_state.dlg_family_msg)
 
     if ai_available():
         with st.expander("Chat with the meal-idea assistant"):
@@ -491,7 +552,7 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
         st.markdown(
             '<style>[data-testid="stDialog"] .st-key-dlg_confirm_btn button, '
             'div[role="dialog"] .st-key-dlg_confirm_btn button {'
-            'background-color:#166534 !important; color:#ffffff !important; border:none !important; font-weight:800 !important;'
+            'background-color:#16a34a !important; color:#ffffff !important; border:none !important; font-weight:800 !important;'
             '}</style>',
             unsafe_allow_html=True,
         )
@@ -531,6 +592,20 @@ def edit_hero_dialog(event):
             "hero_verse_ref": new_verse_ref,
             "hero_image_url": new_image.strip(),
         })
+        st.rerun()
+    if c2.button("Cancel", use_container_width=True):
+        st.rerun()
+
+
+@st.dialog("Food Theme")
+def edit_theme_dialog(event):
+    new_theme = st.text_input(
+        "Theme for this gathering (e.g. 'Mexican night', 'Soup & salad')",
+        value=event.get("food_theme", ""),
+    )
+    c1, c2 = st.columns(2)
+    if c1.button("Save", type="primary", use_container_width=True):
+        save_event({"food_theme": new_theme.strip()})
         st.rerun()
     if c2.button("Cancel", use_container_width=True):
         st.rerun()
@@ -599,6 +674,7 @@ def edit_callout_dialog(event):
 event = load_event()
 signed_families = load_signups()
 allergies = load_allergies()
+family_names = load_family_names()
 active_allergies = {f: n for f, n in allergies.items() if n and n.strip()}
 
 if "admin_open" not in st.session_state:
@@ -793,6 +869,22 @@ if active_allergies:
             small_remove_css(rkey)
 
 # ----------------------------------------------------------------------
+# Food theme (host types a new one each week)
+# ----------------------------------------------------------------------
+theme_text = (event.get("food_theme") or "").strip()
+if theme_text or admin_visible:
+    shown = _html.escape(theme_text) if theme_text else "No theme set yet"
+    st.markdown(
+        '<div class="callout">' + ICON_UTENSILS_D +
+        '<p><b>This Week\'s Food Theme</b><br>' + shown + '</p></div>',
+        unsafe_allow_html=True,
+    )
+    if admin_visible:
+        if st.button(PENCIL, key="edit_theme_btn"):
+            edit_theme_dialog(event)
+        pencil_css("edit_theme_btn")
+
+# ----------------------------------------------------------------------
 # Callout
 # ----------------------------------------------------------------------
 st.markdown(
@@ -860,8 +952,8 @@ for idx, cat in enumerate(event["categories"]):
                 block_html += '<div class="who-label">Who\'s bringing it</div>'
                 for fam in matches:
                     d = signed_families[fam]
-                    fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
-                    dish_bit = (' -- ' + d['dish']) if d.get('dish') else ''
+                    fcolor = family_color(fam)
+                    dish_bit = (' -- ' + _html.escape(d['dish'])) if d.get('dish') else ''
                     block_html += (
                         '<div class="signee-row"><span class="signee-left">'
                         '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
@@ -882,8 +974,8 @@ for idx, cat in enumerate(event["categories"]):
                 )
             else:
                 st.markdown(
-                    '<style>.st-key-' + btn_key + ' button {background-color:#e8a33d !important; '
-                    'color:#1a1206 !important; border:none !important; font-weight:800 !important;}</style>',
+                    '<style>.st-key-' + btn_key + ' button {background-color:#16a34a !important; '
+                    'color:#ffffff !important; border:none !important; font-weight:800 !important;}</style>',
                     unsafe_allow_html=True,
                 )
 
@@ -894,8 +986,8 @@ for idx, cat in enumerate(event["categories"]):
             st.markdown('<div class="who-label">Who\'s bringing it</div>', unsafe_allow_html=True)
             for fam in matches:
                 d = signed_families[fam]
-                fcolor = FAMILY_COLORS.get(fam, "#9ca3af")
-                dish_bit = (' -- ' + d['dish']) if d.get('dish') else ''
+                fcolor = family_color(fam)
+                dish_bit = (' -- ' + _html.escape(d['dish'])) if d.get('dish') else ''
                 row_html = (
                     '<div class="signee-row"><span class="signee-left">'
                     '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
@@ -979,6 +1071,29 @@ if admin_visible:
             st.rerun()
 
     st.divider()
+    st.markdown("**Families**")
+    st.caption("Add a family by last name, or remove one. Families can also add themselves from the sign-up window.")
+    for fam in family_names:
+        fr1, fr2 = st.columns([4, 1])
+        fr1.write(fam)
+        rkey = "rm_family_" + fam
+        if fr2.button("Remove", key=rkey):
+            save_family_names([n for n in family_names if n != fam])
+            if fam in signed_families:
+                remove_signup(fam)
+            st.rerun()
+        small_remove_css(rkey)
+    nf1, nf2 = st.columns([3, 1])
+    new_family_raw = nf1.text_input("New family last name", key="host_new_family", label_visibility="collapsed",
+                                    placeholder="Add a family (last name)")
+    if nf2.button("Add", key="host_add_family_btn", use_container_width=True):
+        ok, msg, _nm = add_family_name(new_family_raw)
+        if ok:
+            st.rerun()
+        else:
+            st.warning(msg)
+
+    st.divider()
     st.markdown("**AI Meal Planner**")
     if not ai_available():
         st.caption(
@@ -1020,11 +1135,12 @@ if admin_visible:
     st.markdown("**Start a new night**")
     st.caption(
         "Clears every family's sign-up so the board is empty for the next gathering. "
-        "Allergy notes stay -- they're saved separately and don't get cleared."
+        "The food theme is cleared too. Allergy notes stay -- they're saved separately and don't get cleared."
     )
     confirm_clear = st.checkbox("I understand this clears all family sign-ups.")
     if st.button("Clear sign-ups for new night", disabled=not confirm_clear):
         clear_all_signups()
+        save_event({"food_theme": ""})
         st.success("Cleared! Ready for the next gathering.")
         st.rerun()
 
