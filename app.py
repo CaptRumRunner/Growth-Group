@@ -162,6 +162,7 @@ def weekday_of(iso_str):
 st.markdown(
     '<style>'
     "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');"
+    '[data-testid="InputInstructions"] {display:none !important;}'
     '#MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}'
     '[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton, '
     '[class*="viewerBadge"], [class*="profileContainer"], [data-testid="manage-app-button"] {display:none !important; visibility:hidden !important;}'
@@ -711,14 +712,19 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
                 f"{family} is also signed up for {', '.join(other_cats)}. "
                 "Their headcount is shared, so people are only counted once."
             )
-    confirm, cancel = dialog_buttons("dlg_signup", confirm_disabled=not (family and dish.strip()))
+    confirm, cancel = dialog_buttons("dlg_signup")
     if cancel:
         st.rerun()
-    if confirm and family and dish.strip():
-        save_signup(family, category_name, cat_id, count, dish.strip())
-        save_allergy(family, allergy_note.strip())
-        st.session_state.last_family = family
-        st.rerun()
+    if confirm:
+        if not family:
+            st.error("Please select your family.")
+        elif not dish.strip():
+            st.error("Please tell us what you are bringing.")
+        else:
+            save_signup(family, category_name, cat_id, count, dish.strip())
+            save_allergy(family, allergy_note.strip())
+            st.session_state.last_family = family
+            st.rerun()
     if family and family_item(current, cat_id):
         if st.button("Remove this family's sign-up for " + category_name, use_container_width=True):
             remove_signup(family, cat_id)
