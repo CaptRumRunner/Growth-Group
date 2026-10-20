@@ -20,6 +20,7 @@ Icons are inline SVGs; edit controls use the plain Unicode pencil glyph
 
 import json
 import re
+import uuid
 import html as _html
 import streamlit as st
 import firebase_admin
@@ -420,6 +421,16 @@ def load_event():
     valid_dates = [d for d in valid_dates if d >= date.today().isoformat()]
     data["upcoming_dates"] = sorted(valid_dates)
 
+    # Every category card gets a permanent id so two cards with the same
+    # name (e.g. two "Main Dish" rows) keep separate sign-ups.
+    changed = False
+    for c in data["categories"]:
+        if not c.get("id"):
+            c["id"] = uuid.uuid4().hex[:8]
+            changed = True
+    if changed:
+        db.collection("meta").document("event").set({"categories": data["categories"]}, merge=True)
+
     # Fall back to the default background photo if none was set (or was
     # explicitly cleared), rather than showing nothing.
     if not data.get("hero_image_url"):
@@ -461,56 +472,82 @@ def add_family_name(raw):
     return True, "Added " + name + ".", name
 
 
+def clean_dish(fam, dish):
+    """Drop an accidental leading 'The <Family> Family --' typed into the dish."""
+    return re.sub(r'^\s*(the\s+)?' + re.escape(fam) + r'\s+family\s*[-:]*\s*', '', dish or '', flags=re.I).strip()
+
+
 def load_signups():
-    """One doc per family: {count, items:[{category, dish}]}. A family's
-    headcount is stored once no matter how many categories it signs up for.
-    Old single-category docs are converted on read."""
+    """One doc per family: {count, items:[{category, cat_id, dish}]}. A family's
+    headcount is stored once no matter how many categories it signs up for."""
     out = {}
     for d in db.collection("signups").stream():
         data = d.to_dict() or {}
-        items = data.get("items")
-        if items is None:
-            items = [{"category": data.get("category", ""), "dish": data.get("dish", "")}] if data.get("category") else []
-        out[d.id] = {"count": int(data.get("count", 0) or 0), "items": items}
+        out[d.id] = {"count": int(data.get("count", 0) or 0), "items": _raw_items(data)}
     return out
 
 
-def family_item(fam_data, category):
+def family_item(fam_data, cat_id):
     if not fam_data:
         return None
     for it in fam_data.get("items", []):
-        if it.get("category") == category:
+        if it.get("cat_id") == cat_id:
             return it
     return None
 
 
-def save_signup(family, category, count, dish=""):
+def _raw_items(data):
+    items = data.get("items")
+    if items is None:
+        items = [{"category": data.get("category", ""), "dish": data.get("dish", "")}] if data.get("category") else []
+    return items
+
+
+def migrate_signups(signups, categories):
+    """Older sign-ups were tied to a category NAME. Attach them to the first
+    card with that name (once), and save so it sticks."""
+    first_by_name = {}
+    for c in categories:
+        first_by_name.setdefault(c.get("name", ""), c["id"])
+    for fam, d in signups.items():
+        dirty = False
+        kept = []
+        for it in d["items"]:
+            if not it.get("cat_id"):
+                cid = first_by_name.get(it.get("category", ""))
+                if cid:
+                    it["cat_id"] = cid
+                    dirty = True
+            kept.append(it)
+        d["items"] = kept
+        if dirty:
+            ref = db.collection("signups").document(fam)
+            if kept:
+                ref.set({"count": d["count"], "items": kept})
+            else:
+                ref.delete()
+    return {f: d for f, d in signups.items() if d["items"]}
+
+
+def save_signup(family, category, cat_id, count, dish=""):
     ref = db.collection("signups").document(family)
     snap = ref.get()
-    items = []
-    if snap.exists:
-        existing = snap.to_dict() or {}
-        items = existing.get("items")
-        if items is None:
-            items = [{"category": existing.get("category", ""), "dish": existing.get("dish", "")}] if existing.get("category") else []
-    items = [i for i in items if i.get("category") != category]
-    items.append({"category": category, "dish": dish})
+    items = _raw_items(snap.to_dict() or {}) if snap.exists else []
+    items = [i for i in items if i.get("cat_id") != cat_id]
+    items.append({"category": category, "cat_id": cat_id, "dish": dish})
     ref.set({"count": count, "items": items})
     bump_version()
 
 
-def remove_signup(family, category=None):
+def remove_signup(family, cat_id=None):
     ref = db.collection("signups").document(family)
-    if category is None:
+    if cat_id is None:
         ref.delete()
     else:
         snap = ref.get()
         if snap.exists:
             data = snap.to_dict() or {}
-            items = data.get("items")
-            if items is None:
-                items = [{"category": data.get("category", ""), "dish": data.get("dish", "")}] if data.get("category") else []
-            items = [i for i in items if i.get("category") != category]
+            items = [i for i in _raw_items(data) if i.get("cat_id") != cat_id]
             if items:
                 ref.set({"count": data.get("count", 0), "items": items})
             else:
@@ -543,7 +580,7 @@ def remove_allergy(family):
 # Dialogs
 # ----------------------------------------------------------------------
 @st.dialog("Sign up to bring something")
-def sign_up_dialog(category_name, category_desc, signed_families, allergies):
+def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat_id):
     D = 'html body [data-testid="stDialog"] '
     st.markdown(
         '<style>'
@@ -612,7 +649,7 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
             unsafe_allow_html=True,
         )
         dish = st.text_input(
-            "What are you bringing?", value=((family_item(current, category_name) or {}).get("dish", "")), key="dlg_dish",
+            "What are you bringing?", value=((family_item(current, cat_id) or {}).get("dish", "")), key="dlg_dish",
             placeholder="e.g. Chicken parmesan", label_visibility="collapsed",
         )
         st.markdown('<div class="su-hint">Lets everyone see what is already covered.</div>', unsafe_allow_html=True)
@@ -642,8 +679,8 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
         with st.expander("Chat with the meal-idea assistant"):
             def _family_system_prompt():
                 others = [
-                    (f, family_item(d, category_name).get("dish", "")) for f, d in signed_families.items()
-                    if family_item(d, category_name) and f != family and family_item(d, category_name).get("dish")
+                    (f, family_item(d, cat_id).get("dish", "")) for f, d in signed_families.items()
+                    if family_item(d, cat_id) and f != family and family_item(d, cat_id).get("dish")
                 ]
                 others_text = (
                     "; ".join(f"{f} is bringing {dish}" for f, dish in others)
@@ -666,7 +703,9 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
             )
 
     if family and current:
-        other_cats = [i["category"] for i in current["items"] if i.get("category") != category_name]
+        live_names = {c["id"]: (c["name"] or "Not set yet") for c in event["categories"]}
+        other_cats = [live_names.get(i.get("cat_id"), i.get("category", "")) for i in current["items"]
+                      if i.get("cat_id") != cat_id]
         if other_cats:
             st.caption(
                 f"{family} is also signed up for {', '.join(other_cats)}. "
@@ -676,13 +715,13 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
     if cancel:
         st.rerun()
     if confirm and family and dish.strip():
-        save_signup(family, category_name, count, dish.strip())
+        save_signup(family, category_name, cat_id, count, dish.strip())
         save_allergy(family, allergy_note.strip())
         st.session_state.last_family = family
         st.rerun()
-    if family and family_item(current, category_name):
+    if family and family_item(current, cat_id):
         if st.button("Remove this family's sign-up for " + category_name, use_container_width=True):
-            remove_signup(family, category_name)
+            remove_signup(family, cat_id)
             st.rerun()
 
 
@@ -797,6 +836,7 @@ def edit_callout_dialog(event):
 # ----------------------------------------------------------------------
 event = load_event()
 signed_families = load_signups()
+signed_families = migrate_signups(signed_families, event["categories"])
 allergies = load_allergies()
 family_names = load_family_names()
 active_allergies = {f: n for f, n in allergies.items() if n and n.strip()}
@@ -1029,7 +1069,8 @@ st.markdown('<div class="section-title">' + ICON_UTENSILS_D + ' Food Sign Up</di
 for idx, cat in enumerate(event["categories"]):
     name, desc, slots = cat["name"], cat.get("desc", ""), cat.get("slots", 1)
     display_name = name if name else "Not set yet"
-    matches = [f for f, d in signed_families.items() if family_item(d, name)]
+    cat_id = cat["id"]
+    matches = [f for f, d in signed_families.items() if family_item(d, cat_id)]
     filled = len(matches)
     remaining = max(slots - filled, 0)
     card_key = f"catcard_{idx}"
@@ -1077,7 +1118,7 @@ for idx, cat in enumerate(event["categories"]):
                 for fam in matches:
                     d = signed_families[fam]
                     fcolor = family_color(fam)
-                    dish_txt = (family_item(d, name) or {}).get('dish', '')
+                    dish_txt = clean_dish(fam, (family_item(d, cat_id) or {}).get('dish', ''))
                     dish_bit = (' -- ' + _html.escape(dish_txt)) if dish_txt else ''
                     block_html += (
                         '<div class="signee-row"><span class="signee-left">'
@@ -1090,7 +1131,7 @@ for idx, cat in enumerate(event["categories"]):
             btn_label = "Full" if remaining == 0 else "Sign Up"
             btn_key = f"signup_{idx}"
             if st.button(btn_label, key=btn_key, use_container_width=True):
-                sign_up_dialog(name if name else display_name, desc, signed_families, allergies)
+                sign_up_dialog(name if name else display_name, desc, signed_families, allergies, cat_id)
             if remaining == 0:
                 st.markdown(
                     '<style>.st-key-' + btn_key + ' button {background-color:#2a2f3a !important; '
@@ -1112,7 +1153,7 @@ for idx, cat in enumerate(event["categories"]):
             for fam in matches:
                 d = signed_families[fam]
                 fcolor = family_color(fam)
-                dish_txt = (family_item(d, name) or {}).get('dish', '')
+                dish_txt = clean_dish(fam, (family_item(d, cat_id) or {}).get('dish', ''))
                 dish_bit = (' -- ' + _html.escape(dish_txt)) if dish_txt else ''
                 row_html = (
                     '<div class="signee-row"><span class="signee-left">'
@@ -1126,7 +1167,7 @@ for idx, cat in enumerate(event["categories"]):
                 with r2:
                     rkey = f"rm_cat_signee_{idx}_{fam}"
                     if st.button("Remove", key=rkey):
-                        remove_signup(fam, name)
+                        remove_signup(fam, cat_id)
                         st.rerun()
                     small_remove_css(rkey)
 
@@ -1150,6 +1191,7 @@ if admin_visible:
         for j in range(total):
             raw_name = st.session_state.get(f"bulk_name_{j}", "Not set yet")
             cats.append({
+                "id": event["categories"][j].get("id") or uuid.uuid4().hex[:8],
                 "name": "" if raw_name == "Not set yet" else raw_name,
                 "desc": st.session_state.get(f"bulk_desc_{j}", ""),
                 "slots": int(st.session_state.get(f"bulk_qty_{j}", 1) or 0),
@@ -1192,7 +1234,7 @@ if admin_visible:
     with ac4:
         if st.button("Add", key="new_cat_add_btn", use_container_width=True):
             cats = [dict(c) for c in event["categories"]]
-            cats.append({"name": "" if new_name == "Not set yet" else new_name, "desc": new_desc, "slots": int(new_qty)})
+            cats.append({"id": uuid.uuid4().hex[:8], "name": "" if new_name == "Not set yet" else new_name, "desc": new_desc, "slots": int(new_qty)})
             save_event({"categories": cats})
             st.rerun()
 
@@ -1236,7 +1278,7 @@ if admin_visible:
         def _host_system_prompt():
             cat_summary = "; ".join(
                 f"{c['name'] or 'untitled'} (needs {c.get('slots', 0)}, "
-                f"{len([f for f, d in signed_families.items() if family_item(d, c['name'])])} signed up)"
+                f"{len([f for f, d in signed_families.items() if family_item(d, c['id'])])} signed up)"
                 for c in event["categories"]
             ) or "no categories set yet"
             dishes = "; ".join(
