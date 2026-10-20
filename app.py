@@ -162,6 +162,8 @@ st.markdown(
     '<style>'
     "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');"
     '#MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}'
+    '[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"], .stDeployButton, '
+    '[class*="viewerBadge"], [class*="profileContainer"], [data-testid="manage-app-button"] {display:none !important; visibility:hidden !important;}'
     # Override Streamlit's own theme variables directly -- dark navy base,
     # gold accent, matching the SBC Hoops app.
     ':root, .stApp {'
@@ -196,6 +198,9 @@ st.markdown(
     '.allergy-card {background:#241c10; border:1px solid #6b4f1a; border-radius:12px; padding:0.75rem 1rem; margin:0.6rem 0;}'
     '.allergy-title {display:flex; align-items:center; gap:0.4rem; font-weight:800; color:#f2b134 !important; font-size:0.95rem; margin-bottom:0.3rem;}'
     '.allergy-row {font-size:0.87rem; color:#e5d4a8 !important; margin-top:0.2rem;}'
+    '.theme-bar {background:#12241d; border:1px solid #1f4d3d; border-radius:12px; padding:0.45rem 0.9rem; margin:0.5rem 0; display:flex; align-items:center; justify-content:space-between; gap:0.8rem;}'
+    '.theme-label {color:#4ade80 !important; font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:0.4rem; white-space:nowrap;}'
+    '.theme-val {color:#d1fae5 !important; font-size:0.92rem; font-weight:600; text-align:right;}'
     '.callout {background:#12241d; border:1px solid #1f4d3d; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}'
     '.callout b {color:#4ade80 !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#d1fae5 !important;}'
     '.cat-card {background:#161b22; border:1.5px solid #2a2f3a; border-radius:14px; padding:0.85rem 1rem; margin-bottom:0.7rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}'
@@ -266,6 +271,23 @@ def pencil_css(key):
         'border:1px solid #3a4150 !important;}</style>',
         unsafe_allow_html=True,
     )
+
+
+def dialog_buttons(prefix, confirm_disabled=False):
+    """Cancel (red) on the left, Confirm (green) on the right."""
+    c1, c2 = st.columns(2)
+    cancel = c1.button("Cancel", key=prefix + "_cancel", use_container_width=True)
+    confirm = c2.button("Confirm", key=prefix + "_confirm", use_container_width=True,
+                        disabled=confirm_disabled)
+    st.markdown(
+        '<style>.st-key-' + prefix + '_cancel button {background-color:#2a1418 !important; '
+        'color:#f87171 !important; border:1px solid #7f1d1d !important; font-weight:700 !important;}'
+        '.st-key-' + prefix + '_confirm button {background-color:#16a34a !important; '
+        'color:#ffffff !important; border:none !important; font-weight:800 !important;}'
+        '.st-key-' + prefix + '_confirm button:disabled {opacity:0.45 !important;}</style>',
+        unsafe_allow_html=True,
+    )
+    return confirm, cancel
 
 
 def small_remove_css(key):
@@ -471,10 +493,10 @@ def remove_allergy(family):
 def sign_up_dialog(category_name, category_desc, signed_families, allergies):
     st.markdown(f"Signing up for **{category_name}**")
     fam_names = load_family_names()
-    last = st.session_state.get("last_family")
-    default_idx = fam_names.index(last) if last in fam_names else 0
-    family = st.selectbox("Your family", fam_names, index=default_idx, key="dlg_family")
-    current = signed_families.get(family)
+    family = st.selectbox(
+        "Your family", fam_names, index=None, placeholder="Select family", key="dlg_family"
+    )
+    current = signed_families.get(family) if family else None
     default_count = current["count"] if current else 2
     count = st.number_input(
         "How many attending", min_value=0, max_value=15, value=default_count, step=1, key="dlg_count"
@@ -530,32 +552,16 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
                 "Ask for dish ideas, ask to scale a recipe, etc.",
             )
 
-    if current and current["category"] != category_name:
+    if family and current and current["category"] != category_name:
         st.caption(f"{family} is currently signed up for {current['category']}. Confirming moves them here.")
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("Cancel", key="dlg_cancel_btn", use_container_width=True):
-            st.rerun()
-        st.markdown(
-            '<style>[data-testid="stDialog"] .st-key-dlg_cancel_btn button, '
-            'div[role="dialog"] .st-key-dlg_cancel_btn button {'
-            'background-color:#2a1418 !important; color:#f87171 !important; border:1px solid #7f1d1d !important;'
-            '}</style>',
-            unsafe_allow_html=True,
-        )
-    with c2:
-        if st.button("Confirm", key="dlg_confirm_btn", use_container_width=True):
-            save_signup(family, category_name, count, dish.strip())
-            save_allergy(family, allergy_note.strip())
-            st.session_state.last_family = family
-            st.rerun()
-        st.markdown(
-            '<style>[data-testid="stDialog"] .st-key-dlg_confirm_btn button, '
-            'div[role="dialog"] .st-key-dlg_confirm_btn button {'
-            'background-color:#16a34a !important; color:#ffffff !important; border:none !important; font-weight:800 !important;'
-            '}</style>',
-            unsafe_allow_html=True,
-        )
+    confirm, cancel = dialog_buttons("dlg_signup", confirm_disabled=not family)
+    if cancel:
+        st.rerun()
+    if confirm and family:
+        save_signup(family, category_name, count, dish.strip())
+        save_allergy(family, allergy_note.strip())
+        st.session_state.last_family = family
+        st.rerun()
     if current:
         if st.button("Remove this family's sign-up", use_container_width=True):
             remove_signup(family)
@@ -565,11 +571,11 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
 @st.dialog("Edit Next Meeting")
 def edit_meeting_dialog(event):
     new_time = st.text_input("Time (e.g. '5:00 PM' or '5:00 - 7:00 PM')", value=event["time"])
-    c1, c2 = st.columns(2)
-    if c1.button("Save", type="primary", use_container_width=True):
+    confirm, cancel = dialog_buttons("dlg_meeting")
+    if confirm:
         save_event({"time": new_time})
         st.rerun()
-    if c2.button("Cancel", use_container_width=True):
+    if cancel:
         st.rerun()
 
 
@@ -583,8 +589,8 @@ def edit_hero_dialog(event):
         "Background image URL (optional -- a photo you have the rights to use)",
         value=event.get("hero_image_url", ""),
     )
-    c1, c2 = st.columns(2)
-    if c1.button("Save", type="primary", use_container_width=True):
+    confirm, cancel = dialog_buttons("dlg_hero")
+    if confirm:
         save_event({
             "hero_title": new_title,
             "hero_sub": new_sub,
@@ -593,7 +599,7 @@ def edit_hero_dialog(event):
             "hero_image_url": new_image.strip(),
         })
         st.rerun()
-    if c2.button("Cancel", use_container_width=True):
+    if cancel:
         st.rerun()
 
 
@@ -603,11 +609,11 @@ def edit_theme_dialog(event):
         "Theme for this gathering (e.g. 'Mexican night', 'Soup & salad')",
         value=event.get("food_theme", ""),
     )
-    c1, c2 = st.columns(2)
-    if c1.button("Save", type="primary", use_container_width=True):
+    confirm, cancel = dialog_buttons("dlg_theme")
+    if confirm:
         save_event({"food_theme": new_theme.strip()})
         st.rerun()
-    if c2.button("Cancel", use_container_width=True):
+    if cancel:
         st.rerun()
 
 
@@ -618,11 +624,11 @@ def edit_location_dialog(event):
         "House description (e.g. 'Red brick, white siding')",
         value=event.get("house_desc", ""),
     )
-    c1, c2 = st.columns(2)
-    if c1.button("Save", type="primary", use_container_width=True):
+    confirm, cancel = dialog_buttons("dlg_location")
+    if confirm:
         save_event({"address": new_address, "house_desc": new_house_desc})
         st.rerun()
-    if c2.button("Cancel", use_container_width=True):
+    if cancel:
         st.rerun()
 
 
@@ -660,11 +666,11 @@ def render_dates_editor(event):
 @st.dialog("Edit Welcome Message")
 def edit_callout_dialog(event):
     new_text = st.text_area("Message", value=event["callout_text"], height=120)
-    c1, c2 = st.columns(2)
-    if c1.button("Save", type="primary", use_container_width=True):
+    confirm, cancel = dialog_buttons("dlg_callout")
+    if confirm:
         save_event({"callout_text": new_text})
         st.rerun()
-    if c2.button("Cancel", use_container_width=True):
+    if cancel:
         st.rerun()
 
 
@@ -875,8 +881,8 @@ theme_text = (event.get("food_theme") or "").strip()
 if theme_text or admin_visible:
     shown = _html.escape(theme_text) if theme_text else "No theme set yet"
     st.markdown(
-        '<div class="callout">' + ICON_UTENSILS_D +
-        '<p><b>This Week\'s Food Theme</b><br>' + shown + '</p></div>',
+        '<div class="theme-bar"><span class="theme-label">' + ICON_UTENSILS_D +
+        'Food Theme</span><span class="theme-val">' + shown + '</span></div>',
         unsafe_allow_html=True,
     )
     if admin_visible:
