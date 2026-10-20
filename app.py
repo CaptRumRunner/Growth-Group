@@ -605,7 +605,7 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
         'font-size:0.7rem; display:inline-flex; align-items:center; justify-content:center;}'
         + D + '.su-req {margin-left:auto; color:#f87171 !important; font-size:0.62rem;}'
         + D + '.su-portion {background:#2b1f0a; border:1px solid #e8a33d; border-radius:9px; padding:0.5rem 0.65rem; '
-        'font-size:0.82rem; color:#fde7c0 !important; margin:0.2rem 0 0.1rem 0;}'
+        'font-size:0.82rem; color:#fde7c0 !important; margin:0.2rem 0 0.9rem 0;}'
         + D + '.su-portion b {color:#e8a33d !important;}'
         + D + '.su-hint {color:#9ca3af !important; font-size:0.72rem; margin:0;}'
         + D + '[class*="st-key-su_c"] [data-testid="stVerticalBlockBorderWrapper"] '
