@@ -660,11 +660,10 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
             "What are you bringing?", value=((family_item(current, cat_id) or {}).get("dish", "")), key="dlg_dish",
             placeholder="e.g. Chicken parmesan", label_visibility="collapsed",
         )
-        st.markdown('<div class="su-hint">Lets everyone see what is already covered.</div>', unsafe_allow_html=True)
         if category_name == "Main Dish":
             st.markdown(
                 '<div class="su-portion"><b>Please bring enough to feed 10-12 people.</b> '
-                'We could have up to 30 guests, so a full pan or large crockpot works best.</div>',
+                'A full pan or large crockpot works best.</div>',
                 unsafe_allow_html=True,
             )
     with st.container(border=True, key="su_c4"):
