@@ -501,24 +501,84 @@ def remove_allergy(family):
 # ----------------------------------------------------------------------
 @st.dialog("Sign up to bring something")
 def sign_up_dialog(category_name, category_desc, signed_families, allergies):
-    st.markdown(f"Signing up for **{category_name}**")
-    fam_names = load_family_names()
-    family = st.selectbox(
-        "Your family", fam_names, index=None, placeholder="Select family", key="dlg_family"
+    D = 'html body [data-testid="stDialog"] '
+    st.markdown(
+        '<style>'
+        + D + 'h2 {color:#e8a33d !important; font-weight:800 !important;}'
+        + D + '[data-testid="stDialogHeader"], ' + D + 'header {border-bottom:2px solid #e8a33d !important; '
+        'background:linear-gradient(135deg,#2b1f0a,#161b22) !important;}'
+        + D + '.su-cat {display:flex; align-items:center; gap:0.7rem; background:#12241d; border:1px solid #1f4d3d; '
+        'border-radius:12px; padding:0.6rem 0.8rem; margin-bottom:0.2rem;}'
+        + D + '.su-ico {width:2.1rem; height:2.1rem; border-radius:9px; background:#2a1f0a; border:1px solid #e8a33d; '
+        'display:flex; align-items:center; justify-content:center; flex-shrink:0;}'
+        + D + '.su-cat small {display:block; color:#6ee7b7 !important; font-size:0.68rem; font-weight:700; '
+        'letter-spacing:0.06em; text-transform:uppercase;}'
+        + D + '.su-cat b {color:#f3f4f6 !important; font-size:1.05rem;}'
+        + D + '.su-label {display:flex; align-items:center; gap:0.4rem; color:#e8a33d !important; font-size:0.72rem; '
+        'font-weight:800; letter-spacing:0.07em; text-transform:uppercase; margin:0 0 0.15rem 0;}'
+        + D + '.su-n {width:1.15rem; height:1.15rem; border-radius:50%; background:#e8a33d; color:#1a1206 !important; '
+        'font-size:0.7rem; display:inline-flex; align-items:center; justify-content:center;}'
+        + D + '.su-req {margin-left:auto; color:#f87171 !important; font-size:0.62rem;}'
+        + D + '.su-hint {color:#9ca3af !important; font-size:0.72rem; margin:0;}'
+        + D + '[class*="st-key-su_c"] [data-testid="stVerticalBlockBorderWrapper"] '
+        '{background:#0d1117 !important; border:1px solid #2a2f3a !important; border-radius:12px !important; '
+        'padding:0.6rem 0.75rem !important;}'
+        + D + '.st-key-su_c3 [data-testid="stVerticalBlockBorderWrapper"] '
+        '{border:1px solid #e8a33d !important; box-shadow:0 0 0 2px rgba(232,163,61,0.15) !important;}'
+        + D + '[class*="st-key-su_c"] [data-testid="stVerticalBlock"] {gap:0.35rem !important; border:none !important; '
+        'background:transparent !important;}'
+        + D + '[class*="st-key-su_c"] input, ' + D + '[class*="st-key-su_c"] [data-baseweb="select"] > div, '
+        + D + '[class*="st-key-su_c"] [data-baseweb="select"] * '
+        '{background-color:#1b222c !important; border-color:#3a4150 !important; font-size:1rem !important;}'
+        + D + '[class*="st-key-su_c"] [data-baseweb="input"], ' + D + '[class*="st-key-su_c"] [data-baseweb="base-input"] '
+        '{background-color:#1b222c !important; border-radius:9px !important;}'
+        + D + '.st-key-dlg_count input {text-align:center; font-weight:800 !important; font-size:1.15rem !important;}'
+        + D + '.st-key-dlg_count button {background-color:#2a2f3a !important; min-width:2.6rem !important;}'
+        + D + '.st-key-dlg_count button:last-of-type {background-color:#e8a33d !important;}'
+        + D + '.st-key-dlg_count button:last-of-type * {color:#1a1206 !important; fill:#1a1206 !important;}'
+        + D + '[data-testid="stExpander"] {border:1px dashed #3a4150 !important; border-radius:10px !important; '
+        'background:#161b22 !important;}'
+        + D + '[data-testid="stExpander"] summary {font-size:0.9rem !important;}'
+        '</style>',
+        unsafe_allow_html=True,
     )
+    st.markdown(
+        '<div class="su-cat"><div class="su-ico">' + cat_icon(category_name) + '</div><div>'
+        '<small>Signing up for</small><b>' + _html.escape(category_name) + '</b></div></div>',
+        unsafe_allow_html=True,
+    )
+    fam_names = load_family_names()
+    with st.container(border=True, key="su_c1"):
+        st.markdown('<div class="su-label"><span class="su-n">1</span>Your family</div>', unsafe_allow_html=True)
+        family = st.selectbox(
+            "Your family", fam_names, index=None, placeholder="Select family", key="dlg_family",
+            label_visibility="collapsed",
+        )
     current = signed_families.get(family) if family else None
     default_count = current["count"] if current else 2
-    count = st.number_input(
-        "How many attending", min_value=0, max_value=15, value=default_count, step=1, key="dlg_count"
-    )
-
-    dish = st.text_input(
-        "What are you bringing?",
-        value=(current.get("dish", "") if current else ""), key="dlg_dish",
-    )
-    allergy_note = st.text_input(
-        "Allergies / dietary notes (optional)", value=allergies.get(family, ""), key="dlg_allergy"
-    )
+    with st.container(border=True, key="su_c2"):
+        st.markdown('<div class="su-label"><span class="su-n">2</span>How many attending</div>', unsafe_allow_html=True)
+        count = st.number_input(
+            "How many attending", min_value=0, max_value=15, value=default_count, step=1, key="dlg_count",
+            label_visibility="collapsed",
+        )
+    with st.container(border=True, key="su_c3"):
+        st.markdown(
+            '<div class="su-label"><span class="su-n">3</span>What are you bringing?'
+            '<span class="su-req">REQUIRED</span></div>',
+            unsafe_allow_html=True,
+        )
+        dish = st.text_input(
+            "What are you bringing?", value=(current.get("dish", "") if current else ""), key="dlg_dish",
+            placeholder="e.g. Chicken parmesan", label_visibility="collapsed",
+        )
+        st.markdown('<div class="su-hint">Lets everyone see what is already covered.</div>', unsafe_allow_html=True)
+    with st.container(border=True, key="su_c4"):
+        st.markdown('<div class="su-label"><span class="su-n">4</span>Allergies / dietary notes</div>', unsafe_allow_html=True)
+        allergy_note = st.text_input(
+            "Allergies / dietary notes", value=allergies.get(family, ""), key="dlg_allergy",
+            placeholder="Nut-free, gluten-free...", label_visibility="collapsed",
+        )
 
     def _add_family_cb():
         ok, msg, nm = add_family_name(st.session_state.get("dlg_new_family", ""))
@@ -564,10 +624,10 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies):
 
     if family and current and current["category"] != category_name:
         st.caption(f"{family} is currently signed up for {current['category']}. Confirming moves them here.")
-    confirm, cancel = dialog_buttons("dlg_signup", confirm_disabled=not family)
+    confirm, cancel = dialog_buttons("dlg_signup", confirm_disabled=not (family and dish.strip()))
     if cancel:
         st.rerun()
-    if confirm and family:
+    if confirm and family and dish.strip():
         save_signup(family, category_name, count, dish.strip())
         save_allergy(family, allergy_note.strip())
         st.session_state.last_family = family
