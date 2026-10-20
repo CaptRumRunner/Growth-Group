@@ -191,7 +191,7 @@ st.markdown(
     '.hero-verse {font-size:0.85rem; font-style:italic; color:#e5e7eb !important; opacity:0.96; border-left:3px solid #e8a33d; padding-left:0.6rem;}'
     '.hero-deco {position:absolute; right:-10px; bottom:-10px; opacity:0.15; z-index:1;}'
     '.stat-card {background:#161b22; border:1px solid #2a2f3a; border-radius:12px; padding:0.65rem 0.75rem; height:100%;}'
-    '.stat-label {font-size:0.68rem; color:#9ca3af !important; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;}'
+    '.stat-label {font-size:0.68rem; color:#e8a33d !important; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;}'
     '.stat-value {font-size:0.92rem; color:#f3f4f6 !important; font-weight:800; margin-top:0.15rem; line-height:1.35;}'
     '.stat-row {display:flex; align-items:flex-start; gap:0.4rem;}'
     '.section-title {display:flex; align-items:center; gap:0.4rem; font-family:"Inter", sans-serif; font-size:1.05rem; font-weight:800; color:#e8a33d !important; margin:0.8rem 0 0.4rem 0; text-transform:uppercase; letter-spacing:0.04em;}'
