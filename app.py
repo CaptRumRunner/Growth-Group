@@ -604,6 +604,9 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
         + D + '.su-n {width:1.15rem; height:1.15rem; border-radius:50%; background:#e8a33d; color:#1a1206 !important; '
         'font-size:0.7rem; display:inline-flex; align-items:center; justify-content:center;}'
         + D + '.su-req {margin-left:auto; color:#f87171 !important; font-size:0.62rem;}'
+        + D + '.su-portion {background:#2b1f0a; border:1px solid #e8a33d; border-radius:9px; padding:0.5rem 0.65rem; '
+        'font-size:0.82rem; color:#fde7c0 !important; margin-top:0.2rem;}'
+        + D + '.su-portion b {color:#e8a33d !important;}'
         + D + '.su-hint {color:#9ca3af !important; font-size:0.72rem; margin:0;}'
         + D + '[class*="st-key-su_c"] [data-testid="stVerticalBlockBorderWrapper"] '
         '{background:#0d1117 !important; border:1px solid #2a2f3a !important; border-radius:12px !important; '
@@ -658,6 +661,12 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
             placeholder="e.g. Chicken parmesan", label_visibility="collapsed",
         )
         st.markdown('<div class="su-hint">Lets everyone see what is already covered.</div>', unsafe_allow_html=True)
+        if category_name == "Main Dish":
+            st.markdown(
+                '<div class="su-portion"><b>Please bring enough to feed 10-12 people.</b> '
+                'We could have up to 30 guests, so a full pan or large crockpot works best.</div>',
+                unsafe_allow_html=True,
+            )
     with st.container(border=True, key="su_c4"):
         st.markdown('<div class="su-label"><span class="su-n">4</span>Allergies / dietary notes</div>', unsafe_allow_html=True)
         allergy_note = st.text_input(
