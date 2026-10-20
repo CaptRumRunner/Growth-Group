@@ -198,9 +198,9 @@ st.markdown(
     '.allergy-card {background:#241c10; border:1px solid #6b4f1a; border-radius:12px; padding:0.75rem 1rem; margin:0.6rem 0;}'
     '.allergy-title {display:flex; align-items:center; gap:0.4rem; font-weight:800; color:#f2b134 !important; font-size:0.95rem; margin-bottom:0.3rem;}'
     '.allergy-row {font-size:0.87rem; color:#e5d4a8 !important; margin-top:0.2rem;}'
-    '.theme-bar {background:#12241d; border:1px solid #1f4d3d; border-radius:12px; padding:0.45rem 0.9rem; margin:0.5rem 0; display:flex; align-items:center; justify-content:space-between; gap:0.8rem;}'
+    '.theme-bar {background:#12241d; border:1px solid #1f4d3d; border-radius:12px; padding:0.45rem 0.9rem; margin:0.5rem 0; display:flex; align-items:center; justify-content:flex-start; gap:0.6rem;}'
     '.theme-label {color:#4ade80 !important; font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:0.4rem; white-space:nowrap;}'
-    '.theme-val {color:#d1fae5 !important; font-size:0.92rem; font-weight:600; text-align:right;}'
+    '.theme-val {color:#d1fae5 !important; font-size:0.92rem; font-weight:600; text-align:left;}'
     '.callout {background:#12241d; border:1px solid #1f4d3d; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}'
     '.callout b {color:#4ade80 !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#d1fae5 !important;}'
     '.cat-card {background:#161b22; border:1.5px solid #2a2f3a; border-radius:14px; padding:0.85rem 1rem; margin-bottom:0.7rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}'
@@ -279,12 +279,22 @@ def dialog_buttons(prefix, confirm_disabled=False):
     cancel = c1.button("Cancel", key=prefix + "_cancel", use_container_width=True)
     confirm = c2.button("Confirm", key=prefix + "_confirm", use_container_width=True,
                         disabled=confirm_disabled)
+    def _sel(suffix, tail):
+        return ', '.join(
+            'html body ' + root + ' .st-key-' + prefix + suffix + ' ' + tail
+            for root in ('[data-testid="stDialog"]', 'div[role="dialog"]')
+        )
     st.markdown(
-        '<style>.st-key-' + prefix + '_cancel button {background-color:#2a1418 !important; '
-        'color:#f87171 !important; border:1px solid #7f1d1d !important; font-weight:700 !important;}'
-        '.st-key-' + prefix + '_confirm button {background-color:#16a34a !important; '
-        'color:#ffffff !important; border:none !important; font-weight:800 !important;}'
-        '.st-key-' + prefix + '_confirm button:disabled {opacity:0.45 !important;}</style>',
+        '<style>'
+        + _sel('_cancel', 'button') + ', ' + _sel('_cancel', 'div.stButton > button') +
+        ' {background-color:#2a1418 !important; color:#f87171 !important; '
+        'border:1px solid #7f1d1d !important; font-weight:700 !important;}'
+        + _sel('_confirm', 'button') + ', ' + _sel('_confirm', 'div.stButton > button') +
+        ' {background-color:#16a34a !important; color:#ffffff !important; '
+        'border:none !important; font-weight:800 !important;}'
+        + _sel('_confirm', 'button:disabled') +
+        ' {opacity:0.45 !important; color:#d1fae5 !important;}'
+        '</style>',
         unsafe_allow_html=True,
     )
     return confirm, cancel
