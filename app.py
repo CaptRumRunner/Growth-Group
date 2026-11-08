@@ -186,75 +186,75 @@ st.markdown(
     'border-radius:50%; display:block; flex-shrink:0; align-self:center;}'
     ".brand-name {font-family:'Inter', sans-serif; font-size:1.5rem; font-weight:900; margin:0; letter-spacing:0.01em; "
     "background: linear-gradient(90deg, #e8a33d, #f2b134, #ef6f61); -webkit-background-clip: text; background-clip: text; color: transparent;}"
-    '.brand-sub {font-size:0.75rem; color:#c9a97a !important; margin-top:-0.1rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:600;}'
-    '.st-key-admin_toggle_btn button {padding: 0.2rem 0.9rem !important; font-size: 0.78rem !important; min-height: 0 !important; margin-top: 0.35rem; font-weight:800 !important; text-transform:uppercase; letter-spacing:0.04em;}'
+    '.brand-sub {font-size:0.95rem; color:#c9a97a !important; margin-top:-0.1rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:600;}'
+    '.st-key-admin_toggle_btn button {padding: 0.2rem 0.9rem !important; font-size:0.95rem !important; min-height: 0 !important; margin-top: 0.35rem; font-weight:800 !important; text-transform:uppercase; letter-spacing:0.04em;}'
     '.hero {position: relative; border-radius: 16px; overflow: hidden; margin: 0.15rem 0 0.8rem 0; color:#f3f4f6; min-height: 190px; background: linear-gradient(120deg, #2a2115 0%, #3a2f1c 45%, #4a3a20 100%); background-size: cover; background-position: center; border:1px solid #2a2f3a;}'
     '.hero-overlay {position: absolute; inset: 0; z-index: 2; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, rgba(8,10,14,0.75), rgba(8,10,14,0.9)); padding: 1.3rem 1.2rem;}'
     ".hero-title {font-family:'Inter', sans-serif; font-size:1.7rem; font-weight:900; line-height:1.2; margin:0; color:#f3f4f6 !important; text-shadow: 0 2px 6px rgba(0,0,0,0.6);}"
     '.hero-sub {font-size:1.02rem; opacity:0.96; margin: 0.15rem 0 0.6rem 0; color:#e8a33d !important; font-weight:700; text-shadow: 0 1px 4px rgba(0,0,0,0.5);}'
-    '.hero-verse {font-size:0.85rem; font-style:italic; color:#e5e7eb !important; opacity:0.96; border-left:3px solid #e8a33d; padding-left:0.6rem;}'
+    '.hero-verse {font-size:0.95rem; font-style:italic; color:#e5e7eb !important; opacity:0.96; border-left:3px solid #e8a33d; padding-left:0.6rem;}'
     '.hero-deco {position:absolute; right:-10px; bottom:-10px; opacity:0.15; z-index:1;}'
     '.stat-card {background:#161b22; border:1px solid #2a2f3a; border-radius:12px; padding:0.65rem 0.75rem; height:100%;}'
-    '.stat-label {font-size:0.68rem; color:#e8a33d !important; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;}'
-    '.stat-value {font-size:0.92rem; color:#f3f4f6 !important; font-weight:800; margin-top:0.15rem; line-height:1.35;}'
+    '.stat-label {font-size:0.95rem; color:#e8a33d !important; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;}'
+    '.stat-value {font-size:1.05rem; color:#f3f4f6 !important; font-weight:800; margin-top:0.15rem; line-height:1.35;}'
     '.stat-row {display:flex; align-items:flex-start; gap:0.4rem;}'
     '.section-title {display:flex; align-items:center; gap:0.4rem; font-family:"Inter", sans-serif; font-size:1.05rem; font-weight:800; color:#e8a33d !important; margin:0.8rem 0 0.4rem 0; text-transform:uppercase; letter-spacing:0.04em;}'
     '.dates-strip {display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.3rem;}'
     '.date-pill {flex: 0 0 auto; min-width: 100px; text-align:center; border-radius:10px; padding:0.5rem 0.6rem; border:1px solid #2a2f3a; background:#161b22;}'
     '.date-pill.next {background:rgba(232,163,61,0.12); border-color:#e8a33d;}'
-    '.date-pill .dow {font-size:0.7rem; color:#9ca3af !important; font-weight:700; text-transform:uppercase;}'
+    '.date-pill .dow {font-size:0.95rem; color:#9ca3af !important; font-weight:700; text-transform:uppercase;}'
     '.date-pill.next .dow {color:#e8a33d !important;}'
-    '.date-pill .dnum {font-size:0.85rem; font-weight:800; color:#f3f4f6 !important; margin-top:0.15rem;}'
+    '.date-pill .dnum {font-size:0.95rem; font-weight:800; color:#f3f4f6 !important; margin-top:0.15rem;}'
     '.allergy-card {background:#241c10; border:1px solid #6b4f1a; border-radius:12px; padding:0.75rem 1rem; margin:0.6rem 0;}'
     '.allergy-title {display:flex; align-items:center; gap:0.4rem; font-weight:800; color:#f2b134 !important; font-size:0.95rem; margin-bottom:0.3rem;}'
-    '.allergy-row {font-size:0.87rem; color:#e5d4a8 !important; margin-top:0.2rem;}'
+    '.allergy-row {font-size:0.95rem; color:#e5d4a8 !important; margin-top:0.2rem;}'
     '.theme-bar {background:linear-gradient(135deg,#2b1f0a,#12241d); border:2px solid #e8a33d; border-radius:14px; padding:0.7rem 1rem; margin:0.7rem 0; display:flex; align-items:center; justify-content:flex-start; gap:0.7rem; animation: themeglow 2.4s ease-in-out infinite;}'
     '@keyframes themeglow {0%,100% {box-shadow:0 0 6px rgba(232,163,61,0.35), 0 0 14px rgba(232,163,61,0.15);} 50% {box-shadow:0 0 16px rgba(232,163,61,0.85), 0 0 34px rgba(232,163,61,0.45);}}'
-    '.theme-label {color:#e8a33d !important; font-weight:900; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:0.4rem; white-space:nowrap;}'
+    '.theme-label {color:#e8a33d !important; font-weight:900; font-size:0.95rem; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:0.4rem; white-space:nowrap;}'
     '.theme-val {color:#ffffff !important; font-size:1.15rem; font-weight:800; text-align:left;}'
     '.callout {background:#12241d; border:1px solid #1f4d3d; border-radius:12px; padding:0.85rem 1rem; margin:0.7rem 0; display:flex; gap:0.6rem;}'
-    '.callout b {color:#4ade80 !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.92rem; color:#d1fae5 !important;}'
+    '.callout b {color:#4ade80 !important;} .callout p {margin:0.2rem 0 0 0; font-size:0.95rem; color:#d1fae5 !important;}'
     '.cat-card {background:#161b22; border:1.5px solid #2a2f3a; border-radius:14px; padding:0.85rem 1rem; margin-bottom:0.7rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}'
     '.cat-row {display:flex; align-items:center; gap:0.7rem;}'
     '.cat-avatar {width:44px; height:44px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#2a2115; border:1px solid #e8a33d;}'
     '.cat-name {font-weight:800; font-size:1.05rem; color:#f3f4f6 !important; margin:0;}'
-    '.cat-desc {color:#9ca3af !important; font-size:0.85rem; margin:0.1rem 0 0 0;}'
-    '.cat-progress {font-size:0.8rem; color:#4ade80 !important; font-weight:700; margin-top:0.15rem;}'
+    '.cat-desc {color:#9ca3af !important; font-size:0.95rem; margin:0.1rem 0 0 0;}'
+    '.cat-progress {font-size:0.95rem; color:#4ade80 !important; font-weight:700; margin-top:0.15rem;}'
     '.cat-row-slim {display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;}'
     '.cat-avatar-sm {width:26px; height:26px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#2a2115; border:1px solid #e8a33d;}'
     '.cat-avatar-sm svg {width:14px !important; height:14px !important;}'
-    '.cat-name-slim {font-weight:800; font-size:0.9rem; color:#f3f4f6 !important; white-space:nowrap; flex-shrink:0;}'
-    '.cat-desc-slim {color:#cbd5e1 !important; font-size:0.85rem; order:3; flex:0 0 100%; white-space:normal; overflow:visible; line-height:1.35; padding-left:2.1rem; margin-top:0.1rem;}'
-    '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.78rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0; order:2;}'
+    '.cat-name-slim {font-weight:800; font-size:0.95rem; color:#f3f4f6 !important; white-space:nowrap; flex-shrink:0;}'
+    '.cat-desc-slim {color:#cbd5e1 !important; font-size:0.95rem; order:3; flex:0 0 100%; white-space:normal; overflow:visible; line-height:1.35; padding-left:2.1rem; margin-top:0.1rem;}'
+    '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.95rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0; order:2;}'
     '.hist-box {max-height:320px; overflow-y:auto;}'
-    '.hist-row {border-bottom:1px solid #2a2f3a; padding:0.4rem 0; font-size:0.85rem; color:#e5e7eb !important;}'
-    '.hist-time {display:block; color:#9ca3af !important; font-size:0.72rem;}'
-    '.hist-act {font-weight:800; text-transform:uppercase; font-size:0.72rem; letter-spacing:0.04em;}'
+    '.hist-row {border-bottom:1px solid #2a2f3a; padding:0.4rem 0; font-size:0.95rem; color:#e5e7eb !important;}'
+    '.hist-time {display:block; color:#9ca3af !important; font-size:0.95rem;}'
+    '.hist-act {font-weight:800; text-transform:uppercase; font-size:0.95rem; letter-spacing:0.04em;}'
     '.hist-act.good {color:#4ade80 !important;} .hist-act.bad {color:#f87171 !important;}'
     '.status-card {background:#161b22; border:1px solid #2a2f3a; border-radius:12px; padding:0.6rem 0.8rem; margin:0.6rem 0;}'
     '.status-row {display:flex; flex-wrap:wrap; align-items:center; gap:0.35rem; margin:0.2rem 0;}'
-    '.status-label {font-size:0.68rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; min-width:5.2rem;}'
+    '.status-label {font-size:0.95rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; min-width:5.2rem;}'
     '.status-label.coming {color:#4ade80 !important;} .status-label.out {color:#f87171 !important;} .status-label.wait {color:#9ca3af !important;}'
-    '.chip {display:inline-flex; align-items:center; gap:0.3rem; border-radius:999px; padding:0.12rem 0.6rem; font-size:0.8rem; font-weight:700; border:1px solid #2a2f3a;}'
+    '.chip {display:inline-flex; align-items:center; gap:0.3rem; border-radius:999px; padding:0.12rem 0.6rem; font-size:0.95rem; font-weight:700; border:1px solid #2a2f3a;}'
     '.chip.coming {background:#12241d; border-color:#1f4d3d; color:#d1fae5 !important;}'
     '.chip.out {background:#2a1418; border-color:#7f1d1d; color:#fca5a5 !important; text-decoration:line-through;}'
     '.chip.wait {background:#1b222c; color:#9ca3af !important;}'
     '.cat-qty-slim.full {color:#6b7280 !important;}'
     '.cat-progress.full {color:#6b7280 !important;}'
-    '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.3rem;}'
-    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.3rem 0.6rem; margin-top:0.15rem; font-size:0.85rem;}'
+    '.who-label {font-size:0.95rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.3rem;}'
+    '.signee-row {display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #16302650, #0d1117); border:1px solid #1f4d3d; border-radius:8px; padding:0.3rem 0.6rem; margin-top:0.15rem; font-size:0.95rem;}'
     '.signee-left {display:flex; align-items:center;}'
     '.signee-avatar {width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#0d1117 !important; font-size:0.7rem; font-weight:900; margin-right:0.55rem; flex-shrink:0;}'
     '.signee-name {font-weight:800; color:#f3f4f6 !important;}'
     '.signee-detail {color:#9ca3af !important;}'
-    'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.9rem; background-color:#161b22; color:#f3f4f6; border:1px solid #2a2f3a;}'
+    'div.stButton > button {border-radius:8px; font-weight:700; font-size:0.95rem; background-color:#161b22; color:#f3f4f6; border:1px solid #2a2f3a;}'
     # Attribute-based selector, matches every Streamlit button regardless of
     # which container (dialog, form, expander) it's rendered inside.
     'button[kind="secondary"], button[kind="secondaryFormSubmit"] {'
     'background-color:#161b22 !important; color:#f3f4f6 !important; border:1px solid #2a2f3a !important;}'
     'button[kind="primary"], button[kind="primaryFormSubmit"] {'
     'background-color:#e8a33d !important; color:#1a1206 !important; border:none !important; font-weight:800 !important;}'
-    '.version-tag {display:inline; text-align:left; color:#4b5563; font-size:0.68rem; margin-left:0.4rem; text-transform:none; letter-spacing:normal; font-weight:400;}'
+    '.version-tag {display:inline; text-align:left; color:#4b5563; font-size:0.95rem; margin-left:0.4rem; text-transform:none; letter-spacing:normal; font-weight:400;}'
     # --- Fallback overrides for native widget chrome. ---
     '[data-testid="stAppViewContainer"], [data-testid="stHeader"], .main {background-color:#0d1117 !important;}'
     '.stTextInput input, .stNumberInput input, .stTextArea textarea, .stDateInput input {'
@@ -296,7 +296,7 @@ def rm_dialog_css(key):
         'html body [data-testid="stDialog"] .rm-confirm {background:#2a1418; border:1px solid #7f1d1d; border-radius:10px; '
         'padding:0.8rem 0.9rem; color:#fde2e2 !important; font-size:0.98rem; margin:0.4rem 0 0.6rem 0;}'
         'html body [data-testid="stDialog"] .rm-confirm b {color:#ffffff !important;}'
-        'html body [data-testid="stDialog"] .rm-confirm span {color:#fca5a5 !important; font-size:0.82rem;}'
+        'html body [data-testid="stDialog"] .rm-confirm span {color:#fca5a5 !important; font-size:0.95rem;}'
         'html body [data-testid="stDialog"] .rm-item {color:#f3f4f6 !important; background:#0d1117; '
         'border:1px solid #2a2f3a; border-radius:10px; padding:0.5rem 0.7rem; margin-top:0.4rem;}</style>',
         unsafe_allow_html=True,
@@ -364,7 +364,7 @@ def dialog_buttons(prefix, confirm_disabled=False, cancel_label="Cancel", confir
 
 def small_remove_css(key):
     st.markdown(
-        '<style>.st-key-' + key + ' button {padding:0.02rem 0.5rem !important; font-size:0.72rem !important; '
+        '<style>.st-key-' + key + ' button {padding:0.02rem 0.5rem !important; font-size:0.95rem !important; '
         'min-height:0 !important; background:#2a1418 !important; color:#f87171 !important; '
         'border:1px solid #5c2a2e !important;}</style>',
         unsafe_allow_html=True,
@@ -714,19 +714,19 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
         'border-radius:12px; padding:0.6rem 0.8rem; margin-bottom:0.2rem;}'
         + D + '.su-ico {width:2.1rem; height:2.1rem; border-radius:9px; background:#2a1f0a; border:1px solid #e8a33d; '
         'display:flex; align-items:center; justify-content:center; flex-shrink:0;}'
-        + D + '.su-cat small {display:block; color:#6ee7b7 !important; font-size:0.68rem; font-weight:700; '
+        + D + '.su-cat small {display:block; color:#6ee7b7 !important; font-size:0.95rem; font-weight:700; '
         'letter-spacing:0.06em; text-transform:uppercase;}'
-        + D + '.su-desc {color:#d1d5db !important; font-size:0.88rem; line-height:1.35; margin-top:0.2rem; white-space:normal;}'
+        + D + '.su-desc {color:#d1d5db !important; font-size:0.95rem; line-height:1.35; margin-top:0.2rem; white-space:normal;}'
         + D + '.su-cat b {color:#f3f4f6 !important; font-size:1.05rem;}'
-        + D + '.su-label {display:flex; align-items:center; gap:0.4rem; color:#e8a33d !important; font-size:0.72rem; '
+        + D + '.su-label {display:flex; align-items:center; gap:0.4rem; color:#e8a33d !important; font-size:0.95rem; '
         'font-weight:800; letter-spacing:0.07em; text-transform:uppercase; margin:0 0 0.15rem 0;}'
         + D + '.su-n {width:1.15rem; height:1.15rem; border-radius:50%; background:#e8a33d; color:#1a1206 !important; '
         'font-size:0.7rem; display:inline-flex; align-items:center; justify-content:center;}'
-        + D + '.su-req {margin-left:auto; color:#f87171 !important; font-size:0.62rem;}'
+        + D + '.su-req {margin-left:auto; color:#f87171 !important; font-size:0.95rem;}'
         + D + '.su-portion {background:#2b1f0a; border:1px solid #e8a33d; border-radius:9px; padding:0.5rem 0.65rem; '
-        'font-size:0.82rem; color:#fde7c0 !important; margin:0.2rem 0 0.9rem 0;}'
+        'font-size:0.95rem; color:#fde7c0 !important; margin:0.2rem 0 0.9rem 0;}'
         + D + '.su-portion b {color:#e8a33d !important;}'
-        + D + '.su-hint {color:#9ca3af !important; font-size:0.72rem; margin:0;}'
+        + D + '.su-hint {color:#9ca3af !important; font-size:0.95rem; margin:0;}'
         + D + '[class*="st-key-su_c"] [data-testid="stVerticalBlockBorderWrapper"] '
         '{background:#0d1117 !important; border:1px solid #2a2f3a !important; border-radius:12px !important; '
         'padding:0.6rem 0.75rem !important;}'
@@ -745,7 +745,7 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
         + D + '.st-key-dlg_count button:last-of-type * {color:#1a1206 !important; fill:#1a1206 !important;}'
         + D + '[data-testid="stExpander"] {border:1px dashed #3a4150 !important; border-radius:10px !important; '
         'background:#161b22 !important;}'
-        + D + '[data-testid="stExpander"] summary {font-size:0.9rem !important;}'
+        + D + '[data-testid="stExpander"] summary {font-size:0.95rem !important;}'
         '</style>',
         unsafe_allow_html=True,
     )
@@ -934,67 +934,21 @@ def undo_cant_make_it_dialog(declined):
             st.rerun()
 
 
-@st.dialog("Cancel a sign-up")
-def remove_my_signup_dialog(signed_families):
-    pending = st.session_state.get("rm_pending")
-    labels = {}
-    for c in event["categories"]:
-        nm = c["name"] or "Not set yet"
-        labels[c["id"]] = nm + (" (" + c["desc"] + ")" if c.get("desc") else "")
-    st.caption("Signed up by accident? Pick your family, then cancel the sign-up. You will be asked to confirm.")
-    fam = st.selectbox("Your family", sorted(signed_families.keys()), index=None, placeholder="Select family",
-                       key="rm_dlg_family", disabled=bool(pending))
-
-    if pending:
-        pfam, pcid = pending
-        pdata = signed_families.get(pfam)
-        if not pdata or (pcid is not None and not family_item(pdata, pcid)):
-            st.session_state.rm_pending = None
-            st.info("That sign-up is already gone.")
-            return
-        if pcid is None:
-            what = "ALL of the sign-ups"
-        else:
-            it = family_item(pdata, pcid)
-            dish = clean_dish(pfam, it.get("dish", ""))
-            what = labels.get(pcid, it.get("category", "this item")) + ((" -- " + dish) if dish else "")
-        rm_dialog_css("rm_none")
-        st.markdown(
-            '<div class="rm-confirm">Are you sure you want to cancel <b>' + _html.escape(what) +
-            '</b> for <b>The ' + _html.escape(pfam) + ' Family</b>?<br>'
-            '<span>Check that this is your family before you confirm.</span></div>',
-            unsafe_allow_html=True,
-        )
-        confirm, cancel = dialog_buttons("dlg_rmconf", cancel_label="No, keep it", confirm_label="Yes, cancel it")
-        if cancel:
-            st.session_state.rm_pending = None
-            st.rerun(scope="fragment")
-        if confirm:
-            remove_signup(pfam, pcid)
-            st.session_state.rm_pending = None
-            st.rerun()
-        return
-
-    if fam:
-        items = signed_families[fam]["items"]
-        for it in items:
-            cid = it.get("cat_id")
-            label = labels.get(cid, it.get("category", "Unknown"))
-            dish = clean_dish(fam, it.get("dish", ""))
-            st.markdown(
-                '<div class="rm-item"><b>' + _html.escape(label) + '</b>' +
-                ((' -- ' + _html.escape(dish)) if dish else '') + '</div>',
-                unsafe_allow_html=True,
-            )
-            if st.button("Cancel this sign-up", key="rm_dlg_" + fam + "_" + str(cid), use_container_width=True):
-                st.session_state.rm_pending = (fam, cid)
-                st.rerun(scope="fragment")
-            rm_dialog_css("rm_dlg_" + fam + "_" + str(cid))
-        if len(items) > 1:
-            if st.button("Cancel ALL of " + fam + "'s sign-ups", key="rm_dlg_all", use_container_width=True):
-                st.session_state.rm_pending = (fam, None)
-                st.rerun(scope="fragment")
-            rm_dialog_css("rm_dlg_all")
+@st.dialog("Cancel sign-up")
+def confirm_cancel_dialog(fam, cat_id, what, by):
+    rm_dialog_css("rm_none")
+    st.markdown(
+        '<div class="rm-confirm">Are you sure you want to cancel <b>' + _html.escape(what) +
+        '</b> for <b>The ' + _html.escape(fam) + ' Family</b>?<br>'
+        '<span>Check that this is the right family before you confirm.</span></div>',
+        unsafe_allow_html=True,
+    )
+    confirm, cancel = dialog_buttons("dlg_xcancel", cancel_label="No, keep it", confirm_label="Yes, cancel it")
+    if cancel:
+        st.rerun()
+    if confirm:
+        remove_signup(fam, cat_id, by=by)
+        st.rerun()
 
 
 @st.dialog("Edit Next Meeting")
@@ -1238,7 +1192,7 @@ with s1:
         pencil_css("edit_meeting_btn")
 with s2:
     house_line = (
-        '<div style="color:#9ca3af; font-size:0.78rem; margin-top:0.15rem;">' + event['house_desc'] + '</div>'
+        '<div style="color:#9ca3af; font-size:0.95rem; margin-top:0.15rem;">' + event['house_desc'] + '</div>'
         if event.get('house_desc') else ''
     )
     st.markdown(
@@ -1286,7 +1240,7 @@ if out_fams:
         undo_cant_make_it_dialog(out_fams)
     st.markdown(
         '<style>.st-key-open_undo_cm button {background-color:#161b22 !important; color:#f3f4f6 !important; '
-        'border:1px dashed #3a4150 !important; font-size:0.85rem !important; font-weight:600 !important;}</style>',
+        'border:1px dashed #3a4150 !important; font-size:0.95rem !important; font-weight:600 !important;}</style>',
         unsafe_allow_html=True,
     )
 
@@ -1373,19 +1327,10 @@ if st.button("Can't make it? Let us know", key="open_cm_dlg", use_container_widt
     cant_make_it_dialog(family_names, declined_families, signed_families)
 st.markdown(
     '<style>.st-key-open_cm_dlg button {background-color:#2a1418 !important; color:#fca5a5 !important; '
-    'border:1px solid #7f1d1d !important; font-size:0.85rem !important; font-weight:700 !important;}'
+    'border:1px solid #7f1d1d !important; font-size:0.95rem !important; font-weight:700 !important;}'
     '.st-key-open_cm_dlg button * {color:#fca5a5 !important;}</style>',
     unsafe_allow_html=True,
 )
-if signed_families:
-    if st.button("Signed up by mistake? Cancel a sign-up", key="open_rm_dlg", use_container_width=True):
-        st.session_state.rm_pending = None
-        remove_my_signup_dialog(signed_families)
-    st.markdown(
-        '<style>.st-key-open_rm_dlg button {background-color:#161b22 !important; color:#f3f4f6 !important; '
-        'border:1px dashed #3a4150 !important; font-size:0.85rem !important; font-weight:600 !important;}</style>',
-        unsafe_allow_html=True,
-    )
 
 def move_category(i, delta):
     cats = [dict(c) for c in event["categories"]]
@@ -1438,25 +1383,46 @@ for idx, cat in enumerate(event["categories"]):
                 '<span class="cat-qty-slim ' + progress_class + '">' + str(filled) + '/' + str(slots) +
                 ' needed</span></div>'
             )
-            if matches and not admin_visible:
-                # Fold the "who's bringing it" list into the SAME markdown
-                # call as the header row -- separate st.markdown/st.columns
-                # calls each get their own automatic spacing from Streamlit
-                # that CSS overrides couldn't reliably suppress, so folding
-                # everything into one HTML block sidesteps that entirely.
+            if matches:
                 block_html += '<div class="who-label">Who\'s bringing it</div>'
-                for fam in matches:
-                    d = signed_families[fam]
-                    fcolor = family_color(fam)
-                    dish_txt = clean_dish(fam, (family_item(d, cat_id) or {}).get('dish', ''))
-                    dish_bit = (' -- ' + _html.escape(dish_txt)) if dish_txt else ''
-                    block_html += (
-                        '<div class="signee-row"><span class="signee-left">'
-                        '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
-                        '<span class="signee-name">The ' + fam + ' Family' + dish_bit + '</span></span>'
-                        '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
-                    )
             st.markdown(block_html, unsafe_allow_html=True)
+            # One row per family: the info on the left, a small red X on the
+            # right to cancel it (asks "are you sure" first).
+            for fam in matches:
+                d = signed_families[fam]
+                fcolor = family_color(fam)
+                item = family_item(d, cat_id) or {}
+                dish_txt = clean_dish(fam, item.get('dish', ''))
+                dish_bit = (' -- ' + _html.escape(dish_txt)) if dish_txt else ''
+                row_html = (
+                    '<div class="signee-row"><span class="signee-left">'
+                    '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
+                    '<span class="signee-name">The ' + fam + ' Family' + dish_bit + '</span></span>'
+                    '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
+                )
+                rowkey = f"srow_{idx}_{fam}"
+                with st.container(key=rowkey):
+                    rcol1, rcol2 = st.columns([8, 1])
+                    with rcol1:
+                        st.markdown(row_html, unsafe_allow_html=True)
+                    with rcol2:
+                        xkey = f"x_cancel_{idx}_{fam}"
+                        if st.button("X", key=xkey):
+                            what = display_name + ((" -- " + dish_txt) if dish_txt else "")
+                            confirm_cancel_dialog(fam, cat_id, what, "host" if admin_visible else "family")
+                st.markdown(
+                    '<style>.st-key-' + rowkey + ' [data-testid="stHorizontalBlock"] {flex-direction:row !important; '
+                    'flex-wrap:nowrap !important; align-items:center !important; gap:0.4rem !important;}'
+                    '.st-key-' + rowkey + ' [data-testid="stColumn"]:first-child, '
+                    '.st-key-' + rowkey + ' [data-testid="column"]:first-child {flex:1 1 auto !important; min-width:0 !important; width:auto !important;}'
+                    '.st-key-' + rowkey + ' [data-testid="stColumn"]:last-child, '
+                    '.st-key-' + rowkey + ' [data-testid="column"]:last-child {flex:0 0 2.1rem !important; min-width:2.1rem !important; width:2.1rem !important;}'
+                    '.st-key-' + xkey + ' button {height:2rem !important; min-height:2rem !important; padding:0 !important; '
+                    'background-color:#2a1418 !important; border:1px solid #7f1d1d !important; border-radius:8px !important; '
+                    'color:#f87171 !important; font-weight:800 !important; width:2.1rem !important;}'
+                    '.st-key-' + xkey + ' button * {color:#f87171 !important;}</style>',
+                    unsafe_allow_html=True,
+                )
         with cc2:
             if admin_visible:
                 ak = f"cardarrows_{idx}"
@@ -1494,32 +1460,6 @@ for idx, cat in enumerate(event["categories"]):
                     'color:#ffffff !important; border:none !important; font-weight:800 !important;}</style>',
                     unsafe_allow_html=True,
                 )
-
-        # Admin mode needs a Remove button per family, so those rows stay as
-        # separate Streamlit widgets (and therefore keep Streamlit's normal
-        # spacing) only while the host panel is open.
-        if matches and admin_visible:
-            st.markdown('<div class="who-label">Who\'s bringing it</div>', unsafe_allow_html=True)
-            for fam in matches:
-                d = signed_families[fam]
-                fcolor = family_color(fam)
-                dish_txt = clean_dish(fam, (family_item(d, cat_id) or {}).get('dish', ''))
-                dish_bit = (' -- ' + _html.escape(dish_txt)) if dish_txt else ''
-                row_html = (
-                    '<div class="signee-row"><span class="signee-left">'
-                    '<span class="signee-avatar" style="background:' + fcolor + ';">' + initials(fam) + '</span>'
-                    '<span class="signee-name">The ' + fam + ' Family' + dish_bit + '</span></span>'
-                    '<span class="signee-detail">' + str(d['count']) + ' people</span></div>'
-                )
-                r1, r2 = st.columns([4, 1])
-                with r1:
-                    st.markdown(row_html, unsafe_allow_html=True)
-                with r2:
-                    rkey = f"rm_cat_signee_{idx}_{fam}"
-                    if st.button("Remove", key=rkey):
-                        remove_signup(fam, cat_id, by="host")
-                        st.rerun()
-                    small_remove_css(rkey)
 
 # ----------------------------------------------------------------------
 # Admin bottom strip: bulk food overview + clear-for-new-night + lock
