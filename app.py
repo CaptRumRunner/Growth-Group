@@ -303,10 +303,12 @@ def rm_dialog_css(key):
     )
 
 
-def arrow_css(key):
+def arrow_css(key, compact=False):
+    size = ('height:1.15rem !important; min-height:1.15rem !important; line-height:1 !important; '
+            'padding:0 0.3rem !important; font-size:0.7rem !important;') if compact else \
+           'padding:0.02rem 0.3rem !important; min-height:0 !important; line-height:1.8 !important; font-size:0.8rem !important;'
     st.markdown(
-        '<style>.st-key-' + key + ' button {padding:0.02rem 0.3rem !important; font-size:0.8rem !important; '
-        'min-height:0 !important; line-height:1.8 !important; background:#1f2530 !important; color:#e8a33d !important; '
+        '<style>.st-key-' + key + ' button {' + size + ' background:#1f2530 !important; color:#e8a33d !important; '
         'border:1px solid #3a4150 !important;}'
         '.st-key-' + key + ' button:disabled {opacity:0.3 !important;}</style>',
         unsafe_allow_html=True,
@@ -910,6 +912,28 @@ def cant_make_it_dialog(fam_names, declined, signed_families):
             st.rerun()
 
 
+@st.dialog("Undo \"can't make it\"")
+def undo_cant_make_it_dialog(declined):
+    st.caption("Marked as not coming by mistake? Pick the family to put them back on the list.")
+    fam = st.selectbox("Family", declined, index=None, placeholder="Select family", key="undo_cm_family")
+    if fam:
+        rm_dialog_css("rm_none")
+        st.markdown(
+            '<div class="rm-confirm">Are you sure you want to remove <b>Can\'t make it</b> for <b>The ' +
+            _html.escape(fam) + ' Family</b>?<br><span>They will go back to "No answer yet" until they sign up.</span></div>',
+            unsafe_allow_html=True,
+        )
+    confirm, cancel = dialog_buttons("dlg_undo_cm", cancel_label="No, keep it", confirm_label="Yes, remove it")
+    if cancel:
+        st.rerun()
+    if confirm:
+        if not fam:
+            st.error("Please select a family.")
+        else:
+            set_declined(fam, False)
+            st.rerun()
+
+
 @st.dialog("Cancel a sign-up")
 def remove_my_signup_dialog(signed_families):
     pending = st.session_state.get("rm_pending")
@@ -1257,6 +1281,14 @@ if wait_fams:
     status_html += '<div class="status-row"><span class="status-label wait">No answer yet (' + str(len(wait_fams)) + ')</span>' + _chips(wait_fams, "wait") + '</div>'
 status_html += '</div>'
 st.markdown(status_html, unsafe_allow_html=True)
+if out_fams:
+    if st.button("Marked \"can't make it\" by mistake? Undo", key="open_undo_cm", use_container_width=True):
+        undo_cant_make_it_dialog(out_fams)
+    st.markdown(
+        '<style>.st-key-open_undo_cm button {background-color:#161b22 !important; color:#f3f4f6 !important; '
+        'border:1px dashed #3a4150 !important; font-size:0.85rem !important; font-weight:600 !important;}</style>',
+        unsafe_allow_html=True,
+    )
 
 # ----------------------------------------------------------------------
 # Upcoming Dates strip
@@ -1547,8 +1579,22 @@ if admin_visible:
         save_event({"categories": cats})
         _reset_bulk_state()
 
+    # One style block for every row's stacked arrows (a separate style element
+    # inside each row would add its own spacing and stretch the rows).
+    st.markdown(
+        '<style>[class*="st-key-bulk_up_"] button, [class*="st-key-bulk_dn_"] button '
+        '{height:1.15rem !important; min-height:1.15rem !important; line-height:1 !important; '
+        'padding:0 0.3rem !important; font-size:0.7rem !important; background:#1f2530 !important; '
+        'color:#e8a33d !important; border:1px solid #3a4150 !important;}'
+        '[class*="st-key-bulk_up_"] button:disabled, [class*="st-key-bulk_dn_"] button:disabled {opacity:0.3 !important;}'
+        '[class*="st-key-bulkarr_"] [data-testid="stVerticalBlock"] {gap:0.15rem !important;}'
+        '[class*="st-key-bulkarr_"] [data-testid="stElementContainer"], '
+        '[class*="st-key-bulkarr_"] [data-testid="element-container"], [class*="st-key-bulkarr_"] .stButton '
+        '{height:1.15rem !important; min-height:0 !important; width:100% !important;}</style>',
+        unsafe_allow_html=True,
+    )
     for i, cat in enumerate(event["categories"]):
-        rc1, rc2, rc3, rc_up, rc_dn, rc4 = st.columns([1.5, 1.9, 0.7, 0.45, 0.45, 0.55])
+        rc1, rc2, rc3, rc_arr, rc4 = st.columns([1.6, 3.4, 0.6, 0.35, 0.45])
         with rc1:
             cur_idx = name_options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
             st.selectbox(
@@ -1565,14 +1611,13 @@ if admin_visible:
                 "Qty", min_value=0, max_value=50, value=int(cat.get("slots", 1)),
                 step=1, key=bk("bulk_qty", i), label_visibility="collapsed", on_change=_save_bulk_row,
             )
-        with rc_up:
-            st.button("\u25b2", key=f"bulk_up_{i}", use_container_width=True, disabled=(i == 0),
-                      on_click=_move_row, args=(i, -1))
-            arrow_css(f"bulk_up_{i}")
-        with rc_dn:
-            st.button("\u25bc", key=f"bulk_dn_{i}", use_container_width=True,
-                      disabled=(i == total_cats - 1), on_click=_move_row, args=(i, 1))
-            arrow_css(f"bulk_dn_{i}")
+        with rc_arr:
+            akey = f"bulkarr_{i}"
+            with st.container(key=akey):
+                st.button("\u25b2", key=f"bulk_up_{i}", use_container_width=True, disabled=(i == 0),
+                          on_click=_move_row, args=(i, -1))
+                st.button("\u25bc", key=f"bulk_dn_{i}", use_container_width=True,
+                          disabled=(i == total_cats - 1), on_click=_move_row, args=(i, 1))
         with rc4:
             st.button("X", key=f"bulk_del_{i}", use_container_width=True, on_click=_delete_row, args=(i,))
             small_remove_css(f"bulk_del_{i}")
