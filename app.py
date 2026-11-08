@@ -27,7 +27,11 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import anthropic
 from streamlit_js_eval import streamlit_js_eval
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:  # very old Python
+    ZoneInfo = None
 
 st.set_page_config(page_title="Growth Group", page_icon=":books:", layout="centered")
 
@@ -222,6 +226,11 @@ st.markdown(
     '.cat-name-slim {font-weight:800; font-size:0.9rem; color:#f3f4f6 !important; white-space:nowrap; flex-shrink:0;}'
     '.cat-desc-slim {color:#cbd5e1 !important; font-size:0.85rem; order:3; flex:0 0 100%; white-space:normal; overflow:visible; line-height:1.35; padding-left:2.1rem; margin-top:0.1rem;}'
     '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.78rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0; order:2;}'
+    '.hist-box {max-height:320px; overflow-y:auto;}'
+    '.hist-row {border-bottom:1px solid #2a2f3a; padding:0.4rem 0; font-size:0.85rem; color:#e5e7eb !important;}'
+    '.hist-time {display:block; color:#9ca3af !important; font-size:0.72rem;}'
+    '.hist-act {font-weight:800; text-transform:uppercase; font-size:0.72rem; letter-spacing:0.04em;}'
+    '.hist-act.good {color:#4ade80 !important;} .hist-act.bad {color:#f87171 !important;}'
     '.status-card {background:#161b22; border:1px solid #2a2f3a; border-radius:12px; padding:0.6rem 0.8rem; margin:0.6rem 0;}'
     '.status-row {display:flex; flex-wrap:wrap; align-items:center; gap:0.35rem; margin:0.2rem 0;}'
     '.status-label {font-size:0.68rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; min-width:5.2rem;}'
@@ -284,6 +293,10 @@ def rm_dialog_css(key):
         '<style>html body [data-testid="stDialog"] .st-key-' + key + ' button {background-color:#2a1418 !important; '
         'color:#f87171 !important; border:1px solid #7f1d1d !important; font-weight:700 !important;}'
         'html body [data-testid="stDialog"] .st-key-' + key + ' button * {color:#f87171 !important;}'
+        'html body [data-testid="stDialog"] .rm-confirm {background:#2a1418; border:1px solid #7f1d1d; border-radius:10px; '
+        'padding:0.8rem 0.9rem; color:#fde2e2 !important; font-size:0.98rem; margin:0.4rem 0 0.6rem 0;}'
+        'html body [data-testid="stDialog"] .rm-confirm b {color:#ffffff !important;}'
+        'html body [data-testid="stDialog"] .rm-confirm span {color:#fca5a5 !important; font-size:0.82rem;}'
         'html body [data-testid="stDialog"] .rm-item {color:#f3f4f6 !important; background:#0d1117; '
         'border:1px solid #2a2f3a; border-radius:10px; padding:0.5rem 0.7rem; margin-top:0.4rem;}</style>',
         unsafe_allow_html=True,
@@ -309,12 +322,12 @@ def pencil_css(key):
     )
 
 
-def dialog_buttons(prefix, confirm_disabled=False):
+def dialog_buttons(prefix, confirm_disabled=False, cancel_label="Cancel", confirm_label="Confirm"):
     """Cancel (red) on the left, Confirm (green) on the right."""
     with st.container(key=prefix + "_row"):
         c1, c2 = st.columns(2)
-        cancel = c1.button("Cancel", key=prefix + "_cancel", use_container_width=True)
-        confirm = c2.button("Confirm", key=prefix + "_confirm", use_container_width=True,
+        cancel = c1.button(cancel_label, key=prefix + "_cancel", use_container_width=True)
+        confirm = c2.button(confirm_label, key=prefix + "_confirm", use_container_width=True,
                             disabled=confirm_disabled)
     # Streamlit stacks columns on narrow phones; keep Cancel/Confirm side by side.
     st.markdown(
@@ -498,6 +511,39 @@ def load_family_names():
     return list(FAMILIES.keys())
 
 
+def log_event(action, family, detail="", by="family"):
+    """Append one line to the host-only history. Never lets a logging problem
+    block a real sign-up."""
+    try:
+        db.collection("history").document(uuid.uuid4().hex).set({
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "action": action, "family": family, "detail": detail, "by": by,
+        })
+    except Exception:
+        pass
+
+
+def load_history():
+    rows = [(d.to_dict() or {}) for d in db.collection("history").stream()]
+    rows.sort(key=lambda r: r.get("ts", ""), reverse=True)
+    return rows
+
+
+def clear_history():
+    for doc in db.collection("history").stream():
+        doc.reference.delete()
+
+
+def fmt_ts(iso):
+    try:
+        t = datetime.fromisoformat(iso)
+        if ZoneInfo is not None:
+            t = t.astimezone(ZoneInfo("America/New_York"))
+        return t.strftime("%a %b %d, %I:%M %p").replace(" 0", " ")
+    except Exception:
+        return iso or ""
+
+
 def load_declined():
     doc = db.collection("meta").document("declined").get()
     if doc.exists:
@@ -505,11 +551,13 @@ def load_declined():
     return []
 
 
-def set_declined(family, declined=True):
+def set_declined(family, declined=True, log=True):
     names = [n for n in load_declined() if n != family]
     if declined:
         names.append(family)
     db.collection("meta").document("declined").set({"names": names})
+    if log:
+        log_event("can't make it" if declined else "coming again", family)
     bump_version()
 
 
@@ -593,28 +641,38 @@ def save_signup(family, category, cat_id, count, dish=""):
     ref = db.collection("signups").document(family)
     snap = ref.get()
     items = _raw_items(snap.to_dict() or {}) if snap.exists else []
+    was_signed = any(i.get("cat_id") == cat_id for i in items)
     items = [i for i in items if i.get("cat_id") != cat_id]
     items.append({"category": category, "cat_id": cat_id, "dish": dish})
     ref.set({"count": count, "items": items})
+    log_event("updated sign-up" if was_signed else "signed up", family,
+              category + (" -- " + dish if dish else "") + " (" + str(count) + " people)")
     # Signing up means the family is coming after all.
     if family in load_declined():
         set_declined(family, False)
     bump_version()
 
 
-def remove_signup(family, cat_id=None):
+def remove_signup(family, cat_id=None, by="family"):
     ref = db.collection("signups").document(family)
+    snap = ref.get()
+    if not snap.exists:
+        bump_version()
+        return
+    data = snap.to_dict() or {}
+    all_items = _raw_items(data)
     if cat_id is None:
-        ref.delete()
+        removed, items = all_items, []
     else:
-        snap = ref.get()
-        if snap.exists:
-            data = snap.to_dict() or {}
-            items = [i for i in _raw_items(data) if i.get("cat_id") != cat_id]
-            if items:
-                ref.set({"count": data.get("count", 0), "items": items})
-            else:
-                ref.delete()
+        removed = [i for i in all_items if i.get("cat_id") == cat_id]
+        items = [i for i in all_items if i.get("cat_id") != cat_id]
+    if items:
+        ref.set({"count": data.get("count", 0), "items": items})
+    else:
+        ref.delete()
+    for it in removed:
+        log_event("cancelled", family,
+                  it.get("category", "") + (" -- " + it.get("dish", "") if it.get("dish") else ""), by)
     bump_version()
 
 
@@ -800,9 +858,27 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
             st.session_state.last_family = family
             st.rerun()
     if family and family_item(current, cat_id):
-        if st.button("Remove this family's sign-up for " + category_name, use_container_width=True):
-            remove_signup(family, cat_id)
-            st.rerun()
+        if st.session_state.get("su_rm_confirm") == (family, cat_id):
+            rm_dialog_css("rm_none")
+            st.markdown(
+                '<div class="rm-confirm">Are you sure you want to cancel <b>' + _html.escape(category_name) +
+                '</b> for <b>The ' + _html.escape(family) + ' Family</b>?<br>'
+                '<span>Check that this is your family before you confirm.</span></div>',
+                unsafe_allow_html=True,
+            )
+            rconfirm, rcancel = dialog_buttons("dlg_su_rm", cancel_label="No, keep it", confirm_label="Yes, cancel it")
+            if rcancel:
+                st.session_state.su_rm_confirm = None
+                st.rerun(scope="fragment")
+            if rconfirm:
+                remove_signup(family, cat_id)
+                st.session_state.su_rm_confirm = None
+                st.rerun()
+        else:
+            if st.button("Cancel this family's sign-up for " + category_name, key="su_rm_btn", use_container_width=True):
+                st.session_state.su_rm_confirm = (family, cat_id)
+                st.rerun(scope="fragment")
+            rm_dialog_css("su_rm_btn")
 
 
 @st.dialog("Can't make it")
@@ -834,17 +910,48 @@ def cant_make_it_dialog(fam_names, declined, signed_families):
             st.rerun()
 
 
-@st.dialog("Remove my sign-up")
+@st.dialog("Cancel a sign-up")
 def remove_my_signup_dialog(signed_families):
-    st.caption("Signed up by accident? Pick your family and remove the sign-up.")
-    fam_choices = sorted(signed_families.keys())
-    fam = st.selectbox("Your family", fam_choices, index=None, placeholder="Select family",
-                       key="rm_dlg_family")
+    pending = st.session_state.get("rm_pending")
+    labels = {}
+    for c in event["categories"]:
+        nm = c["name"] or "Not set yet"
+        labels[c["id"]] = nm + (" (" + c["desc"] + ")" if c.get("desc") else "")
+    st.caption("Signed up by accident? Pick your family, then cancel the sign-up. You will be asked to confirm.")
+    fam = st.selectbox("Your family", sorted(signed_families.keys()), index=None, placeholder="Select family",
+                       key="rm_dlg_family", disabled=bool(pending))
+
+    if pending:
+        pfam, pcid = pending
+        pdata = signed_families.get(pfam)
+        if not pdata or (pcid is not None and not family_item(pdata, pcid)):
+            st.session_state.rm_pending = None
+            st.info("That sign-up is already gone.")
+            return
+        if pcid is None:
+            what = "ALL of the sign-ups"
+        else:
+            it = family_item(pdata, pcid)
+            dish = clean_dish(pfam, it.get("dish", ""))
+            what = labels.get(pcid, it.get("category", "this item")) + ((" -- " + dish) if dish else "")
+        rm_dialog_css("rm_none")
+        st.markdown(
+            '<div class="rm-confirm">Are you sure you want to cancel <b>' + _html.escape(what) +
+            '</b> for <b>The ' + _html.escape(pfam) + ' Family</b>?<br>'
+            '<span>Check that this is your family before you confirm.</span></div>',
+            unsafe_allow_html=True,
+        )
+        confirm, cancel = dialog_buttons("dlg_rmconf", cancel_label="No, keep it", confirm_label="Yes, cancel it")
+        if cancel:
+            st.session_state.rm_pending = None
+            st.rerun(scope="fragment")
+        if confirm:
+            remove_signup(pfam, pcid)
+            st.session_state.rm_pending = None
+            st.rerun()
+        return
+
     if fam:
-        labels = {}
-        for c in event["categories"]:
-            nm = c["name"] or "Not set yet"
-            labels[c["id"]] = nm + (" (" + c["desc"] + ")" if c.get("desc") else "")
         items = signed_families[fam]["items"]
         for it in items:
             cid = it.get("cat_id")
@@ -855,14 +962,14 @@ def remove_my_signup_dialog(signed_families):
                 ((' -- ' + _html.escape(dish)) if dish else '') + '</div>',
                 unsafe_allow_html=True,
             )
-            if st.button("Remove this sign-up", key="rm_dlg_" + fam + "_" + str(cid), use_container_width=True):
-                remove_signup(fam, cid)
-                st.rerun()
+            if st.button("Cancel this sign-up", key="rm_dlg_" + fam + "_" + str(cid), use_container_width=True):
+                st.session_state.rm_pending = (fam, cid)
+                st.rerun(scope="fragment")
             rm_dialog_css("rm_dlg_" + fam + "_" + str(cid))
         if len(items) > 1:
-            if st.button("Remove ALL of " + fam + "'s sign-ups", key="rm_dlg_all", use_container_width=True):
-                remove_signup(fam)
-                st.rerun()
+            if st.button("Cancel ALL of " + fam + "'s sign-ups", key="rm_dlg_all", use_container_width=True):
+                st.session_state.rm_pending = (fam, None)
+                st.rerun(scope="fragment")
             rm_dialog_css("rm_dlg_all")
 
 
@@ -1239,7 +1346,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 if signed_families:
-    if st.button("Signed up by mistake? Remove my sign-up", key="open_rm_dlg", use_container_width=True):
+    if st.button("Signed up by mistake? Cancel a sign-up", key="open_rm_dlg", use_container_width=True):
+        st.session_state.rm_pending = None
         remove_my_signup_dialog(signed_families)
     st.markdown(
         '<style>.st-key-open_rm_dlg button {background-color:#161b22 !important; color:#f3f4f6 !important; '
@@ -1340,6 +1448,7 @@ for idx, cat in enumerate(event["categories"]):
             btn_label = "Full" if remaining == 0 else "Sign Up"
             btn_key = f"signup_{idx}"
             if st.button(btn_label, key=btn_key, use_container_width=True):
+                st.session_state.su_rm_confirm = None
                 sign_up_dialog(name if name else display_name, desc, signed_families, allergies, cat_id)
             if remaining == 0:
                 st.markdown(
@@ -1376,7 +1485,7 @@ for idx, cat in enumerate(event["categories"]):
                 with r2:
                     rkey = f"rm_cat_signee_{idx}_{fam}"
                     if st.button("Remove", key=rkey):
-                        remove_signup(fam, cat_id)
+                        remove_signup(fam, cat_id, by="host")
                         st.rerun()
                     small_remove_css(rkey)
 
@@ -1493,9 +1602,9 @@ if admin_visible:
         if fr2.button("Remove", key=rkey):
             save_family_names([n for n in family_names if n != fam])
             if fam in signed_families:
-                remove_signup(fam)
+                remove_signup(fam, by="host")
             if fam in declined_families:
-                set_declined(fam, False)
+                set_declined(fam, False, log=False)
             st.rerun()
         small_remove_css(rkey)
     nf1, nf2 = st.columns([3, 1])
@@ -1547,15 +1656,40 @@ if admin_visible:
         render_ai_chat("host_ai_chat", _host_system_prompt, "Ask about quantities, balance, meal ideas...")
 
     st.divider()
+    st.markdown("**Sign-up History**")
+    st.caption("Who signed up, changed or cancelled anything since the last new night. If someone cancels the wrong "
+               "family by mistake, look here. It clears when you start a new night.")
+    history_rows = load_history()
+    with st.expander("Show history (" + str(len(history_rows)) + " entries)"):
+        if not history_rows:
+            st.caption("Nothing yet.")
+        else:
+            good = ("signed up", "updated sign-up", "coming again")
+            html_rows = ""
+            for r in history_rows:
+                act = r.get("action", "")
+                cls = "good" if act in good else "bad"
+                by = r.get("by", "family")
+                html_rows += (
+                    '<div class="hist-row"><span class="hist-time">' + _html.escape(fmt_ts(r.get("ts", ""))) +
+                    ('  |  by host' if by == "host" else '') + '</span>'
+                    '<span class="hist-act ' + cls + '">' + _html.escape(act) + '</span> '
+                    '<b>' + _html.escape(r.get("family", "")) + '</b>' +
+                    ((' -- ' + _html.escape(r.get("detail", ""))) if r.get("detail") else '') + '</div>'
+                )
+            st.markdown('<div class="hist-box">' + html_rows + '</div>', unsafe_allow_html=True)
+
+    st.divider()
     st.markdown("**Start a new night**")
     st.caption(
         "Clears every family's sign-up so the board is empty for the next gathering. "
-        "The food theme is cleared too. Allergy notes stay -- they're saved separately and don't get cleared."
+        "The food theme and the sign-up history are cleared too. Allergy notes stay -- they're saved separately and don't get cleared."
     )
     confirm_clear = st.checkbox("I understand this clears all family sign-ups.")
     if st.button("Clear sign-ups for new night", disabled=not confirm_clear):
         clear_all_signups()
         db.collection("meta").document("declined").set({"names": []})
+        clear_history()
         save_event({"food_theme": ""})
         st.success("Cleared! Ready for the next gathering.")
         st.rerun()
