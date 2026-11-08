@@ -216,12 +216,20 @@ st.markdown(
     '.cat-name {font-weight:800; font-size:1.05rem; color:#f3f4f6 !important; margin:0;}'
     '.cat-desc {color:#9ca3af !important; font-size:0.85rem; margin:0.1rem 0 0 0;}'
     '.cat-progress {font-size:0.8rem; color:#4ade80 !important; font-weight:700; margin-top:0.15rem;}'
-    '.cat-row-slim {display:flex; align-items:center; gap:0.5rem; flex-wrap:nowrap; overflow:hidden;}'
+    '.cat-row-slim {display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;}'
     '.cat-avatar-sm {width:26px; height:26px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#2a2115; border:1px solid #e8a33d;}'
     '.cat-avatar-sm svg {width:14px !important; height:14px !important;}'
     '.cat-name-slim {font-weight:800; font-size:0.9rem; color:#f3f4f6 !important; white-space:nowrap; flex-shrink:0;}'
-    '.cat-desc-slim {color:#9ca3af !important; font-size:0.78rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}'
-    '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.78rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0;}'
+    '.cat-desc-slim {color:#cbd5e1 !important; font-size:0.85rem; order:3; flex:0 0 100%; white-space:normal; overflow:visible; line-height:1.35; padding-left:2.1rem; margin-top:0.1rem;}'
+    '.cat-qty-slim {color:#4ade80 !important; font-weight:700; font-size:0.78rem; white-space:nowrap; margin-left:auto; padding-left:0.4rem; flex-shrink:0; order:2;}'
+    '.status-card {background:#161b22; border:1px solid #2a2f3a; border-radius:12px; padding:0.6rem 0.8rem; margin:0.6rem 0;}'
+    '.status-row {display:flex; flex-wrap:wrap; align-items:center; gap:0.35rem; margin:0.2rem 0;}'
+    '.status-label {font-size:0.68rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; min-width:5.2rem;}'
+    '.status-label.coming {color:#4ade80 !important;} .status-label.out {color:#f87171 !important;} .status-label.wait {color:#9ca3af !important;}'
+    '.chip {display:inline-flex; align-items:center; gap:0.3rem; border-radius:999px; padding:0.12rem 0.6rem; font-size:0.8rem; font-weight:700; border:1px solid #2a2f3a;}'
+    '.chip.coming {background:#12241d; border-color:#1f4d3d; color:#d1fae5 !important;}'
+    '.chip.out {background:#2a1418; border-color:#7f1d1d; color:#fca5a5 !important; text-decoration:line-through;}'
+    '.chip.wait {background:#1b222c; color:#9ca3af !important;}'
     '.cat-qty-slim.full {color:#6b7280 !important;}'
     '.cat-progress.full {color:#6b7280 !important;}'
     '.who-label {font-size:0.72rem; font-weight:700; color:#9ca3af !important; text-transform:uppercase; letter-spacing:0.03em; margin-top:0.3rem;}'
@@ -271,6 +279,27 @@ st.markdown(
 )
 
 
+def rm_dialog_css(key):
+    st.markdown(
+        '<style>html body [data-testid="stDialog"] .st-key-' + key + ' button {background-color:#2a1418 !important; '
+        'color:#f87171 !important; border:1px solid #7f1d1d !important; font-weight:700 !important;}'
+        'html body [data-testid="stDialog"] .st-key-' + key + ' button * {color:#f87171 !important;}'
+        'html body [data-testid="stDialog"] .rm-item {color:#f3f4f6 !important; background:#0d1117; '
+        'border:1px solid #2a2f3a; border-radius:10px; padding:0.5rem 0.7rem; margin-top:0.4rem;}</style>',
+        unsafe_allow_html=True,
+    )
+
+
+def arrow_css(key):
+    st.markdown(
+        '<style>.st-key-' + key + ' button {padding:0.02rem 0.3rem !important; font-size:0.8rem !important; '
+        'min-height:0 !important; line-height:1.8 !important; background:#1f2530 !important; color:#e8a33d !important; '
+        'border:1px solid #3a4150 !important;}'
+        '.st-key-' + key + ' button:disabled {opacity:0.3 !important;}</style>',
+        unsafe_allow_html=True,
+    )
+
+
 def pencil_css(key):
     st.markdown(
         '<style>.st-key-' + key + ' button {padding:0.02rem 0.5rem !important; font-size:1rem !important; '
@@ -282,10 +311,19 @@ def pencil_css(key):
 
 def dialog_buttons(prefix, confirm_disabled=False):
     """Cancel (red) on the left, Confirm (green) on the right."""
-    c1, c2 = st.columns(2)
-    cancel = c1.button("Cancel", key=prefix + "_cancel", use_container_width=True)
-    confirm = c2.button("Confirm", key=prefix + "_confirm", use_container_width=True,
-                        disabled=confirm_disabled)
+    with st.container(key=prefix + "_row"):
+        c1, c2 = st.columns(2)
+        cancel = c1.button("Cancel", key=prefix + "_cancel", use_container_width=True)
+        confirm = c2.button("Confirm", key=prefix + "_confirm", use_container_width=True,
+                            disabled=confirm_disabled)
+    # Streamlit stacks columns on narrow phones; keep Cancel/Confirm side by side.
+    st.markdown(
+        '<style>.st-key-' + prefix + '_row [data-testid="stHorizontalBlock"] '
+        '{flex-direction:row !important; flex-wrap:nowrap !important; gap:0.75rem !important;}'
+        '.st-key-' + prefix + '_row [data-testid="stColumn"], .st-key-' + prefix + '_row [data-testid="column"] '
+        '{min-width:0 !important; flex:1 1 0 !important; width:auto !important;}</style>',
+        unsafe_allow_html=True,
+    )
     def _sel(suffix, tail):
         return ', '.join(
             'html body ' + root + ' .st-key-' + prefix + suffix + ' ' + tail
@@ -299,6 +337,8 @@ def dialog_buttons(prefix, confirm_disabled=False):
         + _sel('_confirm', 'button') + ', ' + _sel('_confirm', 'div.stButton > button') +
         ' {background-color:#16a34a !important; color:#ffffff !important; '
         'border:none !important; font-weight:800 !important;}'
+        + _sel('_cancel', 'button *') + ' {color:#f87171 !important;}'
+        + _sel('_confirm', 'button *') + ' {color:#ffffff !important;}'
         + _sel('_confirm', 'button:disabled') +
         ' {opacity:0.45 !important; color:#d1fae5 !important;}'
         '</style>',
@@ -458,6 +498,21 @@ def load_family_names():
     return list(FAMILIES.keys())
 
 
+def load_declined():
+    doc = db.collection("meta").document("declined").get()
+    if doc.exists:
+        return list((doc.to_dict() or {}).get("names", []))
+    return []
+
+
+def set_declined(family, declined=True):
+    names = [n for n in load_declined() if n != family]
+    if declined:
+        names.append(family)
+    db.collection("meta").document("declined").set({"names": names})
+    bump_version()
+
+
 def save_family_names(names):
     db.collection("meta").document("families").set({"names": names})
     bump_version()
@@ -541,6 +596,9 @@ def save_signup(family, category, cat_id, count, dish=""):
     items = [i for i in items if i.get("cat_id") != cat_id]
     items.append({"category": category, "cat_id": cat_id, "dish": dish})
     ref.set({"count": count, "items": items})
+    # Signing up means the family is coming after all.
+    if family in load_declined():
+        set_declined(family, False)
     bump_version()
 
 
@@ -598,6 +656,7 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
         'display:flex; align-items:center; justify-content:center; flex-shrink:0;}'
         + D + '.su-cat small {display:block; color:#6ee7b7 !important; font-size:0.68rem; font-weight:700; '
         'letter-spacing:0.06em; text-transform:uppercase;}'
+        + D + '.su-desc {color:#d1d5db !important; font-size:0.88rem; line-height:1.35; margin-top:0.2rem; white-space:normal;}'
         + D + '.su-cat b {color:#f3f4f6 !important; font-size:1.05rem;}'
         + D + '.su-label {display:flex; align-items:center; gap:0.4rem; color:#e8a33d !important; font-size:0.72rem; '
         'font-weight:800; letter-spacing:0.07em; text-transform:uppercase; margin:0 0 0.15rem 0;}'
@@ -632,7 +691,9 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
     )
     st.markdown(
         '<div class="su-cat"><div class="su-ico">' + cat_icon(category_name) + '</div><div>'
-        '<small>Signing up for</small><b>' + _html.escape(category_name) + '</b></div></div>',
+        '<small>Signing up for</small><b>' + _html.escape(category_name) + '</b>'
+        + ('<div class="su-desc">' + _html.escape(category_desc) + '</div>' if category_desc else '')
+        + '</div></div>',
         unsafe_allow_html=True,
     )
     fam_names = load_family_names()
@@ -642,6 +703,8 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
             "Your family", fam_names, index=None, placeholder="Select family", key="dlg_family",
             label_visibility="collapsed",
         )
+    if family and family in declined_families:
+        st.caption(family + " is marked as not coming. Signing up will mark them as coming again.")
     current = signed_families.get(family) if family else None
     default_count = current["count"] if current else 2
     with st.container(border=True, key="su_c2"):
@@ -740,6 +803,67 @@ def sign_up_dialog(category_name, category_desc, signed_families, allergies, cat
         if st.button("Remove this family's sign-up for " + category_name, use_container_width=True):
             remove_signup(family, cat_id)
             st.rerun()
+
+
+@st.dialog("Can't make it")
+def cant_make_it_dialog(fam_names, declined, signed_families):
+    st.caption("Let everyone know your family can't come this time. Any food your family signed up for will be removed.")
+    fam = st.selectbox("Your family", fam_names, index=None, placeholder="Select family", key="cm_family")
+    if fam and fam in declined:
+        st.info(fam + " is marked as not coming.")
+        if st.button("We can come after all", key="cm_back", use_container_width=True):
+            set_declined(fam, False)
+            st.rerun()
+        st.markdown(
+            '<style>html body [data-testid="stDialog"] .st-key-cm_back button {background-color:#16a34a !important; '
+            'color:#ffffff !important; border:none !important; font-weight:800 !important;}'
+            'html body [data-testid="stDialog"] .st-key-cm_back button * {color:#ffffff !important;}</style>',
+            unsafe_allow_html=True,
+        )
+        return
+    confirm, cancel = dialog_buttons("dlg_cm")
+    if cancel:
+        st.rerun()
+    if confirm:
+        if not fam:
+            st.error("Please select your family.")
+        else:
+            if fam in signed_families:
+                remove_signup(fam)
+            set_declined(fam, True)
+            st.rerun()
+
+
+@st.dialog("Remove my sign-up")
+def remove_my_signup_dialog(signed_families):
+    st.caption("Signed up by accident? Pick your family and remove the sign-up.")
+    fam_choices = sorted(signed_families.keys())
+    fam = st.selectbox("Your family", fam_choices, index=None, placeholder="Select family",
+                       key="rm_dlg_family")
+    if fam:
+        labels = {}
+        for c in event["categories"]:
+            nm = c["name"] or "Not set yet"
+            labels[c["id"]] = nm + (" (" + c["desc"] + ")" if c.get("desc") else "")
+        items = signed_families[fam]["items"]
+        for it in items:
+            cid = it.get("cat_id")
+            label = labels.get(cid, it.get("category", "Unknown"))
+            dish = clean_dish(fam, it.get("dish", ""))
+            st.markdown(
+                '<div class="rm-item"><b>' + _html.escape(label) + '</b>' +
+                ((' -- ' + _html.escape(dish)) if dish else '') + '</div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("Remove this sign-up", key="rm_dlg_" + fam + "_" + str(cid), use_container_width=True):
+                remove_signup(fam, cid)
+                st.rerun()
+            rm_dialog_css("rm_dlg_" + fam + "_" + str(cid))
+        if len(items) > 1:
+            if st.button("Remove ALL of " + fam + "'s sign-ups", key="rm_dlg_all", use_container_width=True):
+                remove_signup(fam)
+                st.rerun()
+            rm_dialog_css("rm_dlg_all")
 
 
 @st.dialog("Edit Next Meeting")
@@ -856,6 +980,7 @@ signed_families = load_signups()
 signed_families = migrate_signups(signed_families, event["categories"])
 allergies = load_allergies()
 family_names = load_family_names()
+declined_families = [f for f in load_declined() if f in family_names]
 active_allergies = {f: n for f, n in allergies.items() if n and n.strip()}
 
 if "admin_open" not in st.session_state:
@@ -864,6 +989,8 @@ if "admin_ok" not in st.session_state:
     st.session_state.admin_ok = False
 if "show_dates_editor" not in st.session_state:
     st.session_state.show_dates_editor = False
+if "bulk_ver" not in st.session_state:
+    st.session_state.bulk_ver = 0
 if "awaiting_pin" not in st.session_state:
     st.session_state.awaiting_pin = False
 if "host_prompt_attempt" not in st.session_state:
@@ -1004,6 +1131,27 @@ with s3:
     )
 
 # ----------------------------------------------------------------------
+# Family status: who is coming / can't make it / hasn't answered
+# ----------------------------------------------------------------------
+coming_fams = [f for f in family_names if f in signed_families and f not in declined_families]
+out_fams = [f for f in family_names if f in declined_families]
+wait_fams = [f for f in family_names if f not in coming_fams and f not in out_fams]
+
+
+def _chips(names, kind):
+    return "".join('<span class="chip ' + kind + '">' + _html.escape(n) + '</span>' for n in names)
+
+
+status_html = '<div class="status-card">'
+status_html += '<div class="status-row"><span class="status-label coming">Coming (' + str(len(coming_fams)) + ')</span>' + (_chips(coming_fams, "coming") or '<span class="chip wait">None yet</span>') + '</div>'
+if out_fams:
+    status_html += '<div class="status-row"><span class="status-label out">Can\'t make it (' + str(len(out_fams)) + ')</span>' + _chips(out_fams, "out") + '</div>'
+if wait_fams:
+    status_html += '<div class="status-row"><span class="status-label wait">No answer yet (' + str(len(wait_fams)) + ')</span>' + _chips(wait_fams, "wait") + '</div>'
+status_html += '</div>'
+st.markdown(status_html, unsafe_allow_html=True)
+
+# ----------------------------------------------------------------------
 # Upcoming Dates strip
 # ----------------------------------------------------------------------
 dh1, dh2 = st.columns([3, 1])
@@ -1082,6 +1230,31 @@ if theme_text or admin_visible:
 # Food Sign Up section
 # ----------------------------------------------------------------------
 st.markdown('<div class="section-title">' + ICON_UTENSILS_D + ' Food Sign Up</div>', unsafe_allow_html=True)
+if st.button("Can't make it? Let us know", key="open_cm_dlg", use_container_width=True):
+    cant_make_it_dialog(family_names, declined_families, signed_families)
+st.markdown(
+    '<style>.st-key-open_cm_dlg button {background-color:#2a1418 !important; color:#fca5a5 !important; '
+    'border:1px solid #7f1d1d !important; font-size:0.85rem !important; font-weight:700 !important;}'
+    '.st-key-open_cm_dlg button * {color:#fca5a5 !important;}</style>',
+    unsafe_allow_html=True,
+)
+if signed_families:
+    if st.button("Signed up by mistake? Remove my sign-up", key="open_rm_dlg", use_container_width=True):
+        remove_my_signup_dialog(signed_families)
+    st.markdown(
+        '<style>.st-key-open_rm_dlg button {background-color:#161b22 !important; color:#f3f4f6 !important; '
+        'border:1px dashed #3a4150 !important; font-size:0.85rem !important; font-weight:600 !important;}</style>',
+        unsafe_allow_html=True,
+    )
+
+def move_category(i, delta):
+    cats = [dict(c) for c in event["categories"]]
+    j = i + delta
+    if 0 <= j < len(cats):
+        cats[i], cats[j] = cats[j], cats[i]
+        save_event({"categories": cats})
+        st.session_state.bulk_ver += 1
+
 
 for idx, cat in enumerate(event["categories"]):
     name, desc, slots = cat["name"], cat.get("desc", ""), cat.get("slots", 1)
@@ -1121,7 +1294,7 @@ for idx, cat in enumerate(event["categories"]):
             block_html = (
                 '<div class="cat-row-slim"><div class="cat-avatar-sm">' + cat_icon(name) + '</div>'
                 '<span class="cat-name-slim">' + display_name + '</span>'
-                '<span class="cat-desc-slim">' + desc + '</span>'
+                '<span class="cat-desc-slim">' + _html.escape(desc) + '</span>'
                 '<span class="cat-qty-slim ' + progress_class + '">' + str(filled) + '/' + str(slots) +
                 ' needed</span></div>'
             )
@@ -1145,6 +1318,25 @@ for idx, cat in enumerate(event["categories"]):
                     )
             st.markdown(block_html, unsafe_allow_html=True)
         with cc2:
+            if admin_visible:
+                ak = f"cardarrows_{idx}"
+                with st.container(key=ak):
+                    ar1, ar2 = st.columns(2)
+                    with ar1:
+                        st.button("\u25b2", key=f"card_up_{idx}", use_container_width=True, disabled=(idx == 0),
+                                  on_click=move_category, args=(idx, -1))
+                    with ar2:
+                        st.button("\u25bc", key=f"card_dn_{idx}", use_container_width=True,
+                                  disabled=(idx == len(event["categories"]) - 1), on_click=move_category, args=(idx, 1))
+                arrow_css(f"card_up_{idx}")
+                arrow_css(f"card_dn_{idx}")
+                st.markdown(
+                    '<style>.st-key-' + ak + ' {margin-bottom:0.35rem !important;}.st-key-' + ak + ' [data-testid="stHorizontalBlock"] {flex-direction:row !important; '
+                    'flex-wrap:nowrap !important; gap:0.4rem !important;}'
+                    '.st-key-' + ak + ' [data-testid="stColumn"], .st-key-' + ak + ' [data-testid="column"] '
+                    '{min-width:0 !important; flex:1 1 0 !important; width:auto !important;}</style>',
+                    unsafe_allow_html=True,
+                )
             btn_label = "Full" if remaining == 0 else "Sign Up"
             btn_key = f"signup_{idx}"
             if st.button(btn_label, key=btn_key, use_container_width=True):
@@ -1203,41 +1395,77 @@ if admin_visible:
     name_options = ["Not set yet"] + TYPICAL_CATEGORIES
     total_cats = len(event["categories"])
 
+    def bk(prefix, idx):
+        # Row widgets are keyed by position AND a version number. The version
+        # changes after a move/delete so every row is rebuilt from the saved
+        # list (otherwise the page keeps showing the old row values).
+        return f"{prefix}_{idx}_{st.session_state.bulk_ver}"
+
     def _save_bulk_row(total=total_cats):
         cats = []
         for j in range(total):
-            raw_name = st.session_state.get(f"bulk_name_{j}", "Not set yet")
+            raw_name = st.session_state.get(bk("bulk_name", j), "Not set yet")
             cats.append({
                 "id": event["categories"][j].get("id") or uuid.uuid4().hex[:8],
                 "name": "" if raw_name == "Not set yet" else raw_name,
-                "desc": st.session_state.get(f"bulk_desc_{j}", ""),
-                "slots": int(st.session_state.get(f"bulk_qty_{j}", 1) or 0),
+                "desc": st.session_state.get(bk("bulk_desc", j), ""),
+                "slots": int(st.session_state.get(bk("bulk_qty", j), 1) or 0),
             })
         save_event({"categories": cats})
 
+    def _reset_bulk_state():
+        st.session_state.bulk_ver += 1
+
+    def _move_row(i, delta, total=total_cats):
+        j = i + delta
+        if j < 0 or j >= total:
+            return
+        cats = []
+        for k in range(total):
+            raw_name = st.session_state.get(bk("bulk_name", k), "Not set yet")
+            cats.append({
+                "id": event["categories"][k].get("id") or uuid.uuid4().hex[:8],
+                "name": "" if raw_name == "Not set yet" else raw_name,
+                "desc": st.session_state.get(bk("bulk_desc", k), ""),
+                "slots": int(st.session_state.get(bk("bulk_qty", k), 1) or 0),
+            })
+        cats[i], cats[j] = cats[j], cats[i]
+        save_event({"categories": cats})
+        _reset_bulk_state()
+
+    def _delete_row(i):
+        cats = [dict(c) for k, c in enumerate(event["categories"]) if k != i]
+        save_event({"categories": cats})
+        _reset_bulk_state()
+
     for i, cat in enumerate(event["categories"]):
-        rc1, rc2, rc3, rc4 = st.columns([1.6, 2.1, 0.8, 0.6])
+        rc1, rc2, rc3, rc_up, rc_dn, rc4 = st.columns([1.5, 1.9, 0.7, 0.45, 0.45, 0.55])
         with rc1:
             cur_idx = name_options.index(cat["name"]) if cat["name"] in TYPICAL_CATEGORIES else 0
             st.selectbox(
                 "Category", options=name_options, index=cur_idx,
-                key=f"bulk_name_{i}", label_visibility="collapsed", on_change=_save_bulk_row,
+                key=bk("bulk_name", i), label_visibility="collapsed", on_change=_save_bulk_row,
             )
         with rc2:
             st.text_input(
-                "Description", value=cat.get("desc", ""), key=f"bulk_desc_{i}",
+                "Description", value=cat.get("desc", ""), key=bk("bulk_desc", i),
                 label_visibility="collapsed", on_change=_save_bulk_row,
             )
         with rc3:
             st.number_input(
                 "Qty", min_value=0, max_value=50, value=int(cat.get("slots", 1)),
-                step=1, key=f"bulk_qty_{i}", label_visibility="collapsed", on_change=_save_bulk_row,
+                step=1, key=bk("bulk_qty", i), label_visibility="collapsed", on_change=_save_bulk_row,
             )
+        with rc_up:
+            st.button("\u25b2", key=f"bulk_up_{i}", use_container_width=True, disabled=(i == 0),
+                      on_click=_move_row, args=(i, -1))
+            arrow_css(f"bulk_up_{i}")
+        with rc_dn:
+            st.button("\u25bc", key=f"bulk_dn_{i}", use_container_width=True,
+                      disabled=(i == total_cats - 1), on_click=_move_row, args=(i, 1))
+            arrow_css(f"bulk_dn_{i}")
         with rc4:
-            if st.button("X", key=f"bulk_del_{i}", use_container_width=True):
-                cats = [dict(c) for j, c in enumerate(event["categories"]) if j != i]
-                save_event({"categories": cats})
-                st.rerun()
+            st.button("X", key=f"bulk_del_{i}", use_container_width=True, on_click=_delete_row, args=(i,))
             small_remove_css(f"bulk_del_{i}")
 
     st.markdown("*Add a new category:*")
@@ -1266,6 +1494,8 @@ if admin_visible:
             save_family_names([n for n in family_names if n != fam])
             if fam in signed_families:
                 remove_signup(fam)
+            if fam in declined_families:
+                set_declined(fam, False)
             st.rerun()
         small_remove_css(rkey)
     nf1, nf2 = st.columns([3, 1])
@@ -1325,6 +1555,7 @@ if admin_visible:
     confirm_clear = st.checkbox("I understand this clears all family sign-ups.")
     if st.button("Clear sign-ups for new night", disabled=not confirm_clear):
         clear_all_signups()
+        db.collection("meta").document("declined").set({"names": []})
         save_event({"food_theme": ""})
         st.success("Cleared! Ready for the next gathering.")
         st.rerun()
